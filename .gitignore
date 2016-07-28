@@ -1,6 +1,12 @@
-# Idea files
+target
+
+#IDEA Files
 .idea
 *.iml
+*.ipr
 
-# Maven files
-target
+#Eclipse files
+*.settings
+*.classpath
+*.project
+*.pydevproject

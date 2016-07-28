@@ -8,9 +8,35 @@
     <artifactId>htmlelements</artifactId>
     <version>1.0-SNAPSHOT</version>
 
+    <parent>
+        <groupId>ru.qatools</groupId>
+        <artifactId>opensource-parent</artifactId>
+        <version>1.2</version>
+    </parent>
+
+    <name>Html Elements</name>
+
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <scm>
+        <url>https://github.com/qameta/htmlelements</url>
+        <connection>scm:git@github.com:qameta/htmlelements.git</connection>
+        <developerConnection>scm:git:git@github.com:qameta/htmlelements.git</developerConnection>
+    </scm>
+
+    <issueManagement>
+        <system>GitHub Issues</system>
+        <url>https://github.com/qameta/htmlelements/issues</url>
+    </issueManagement>
+
     <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <compiler.version>1.8</compiler.version>
 
         <selenium.version>2.53.0</selenium.version>
     </properties>
@@ -39,19 +65,5 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
 
 </project>

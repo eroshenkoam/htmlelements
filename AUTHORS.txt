@@ -1,0 +1,4 @@
+The following authors have created the source code of "Html Elements"
+published and distributed by Artem Eroshenko as the owner:
+
+* Artem Eroshenko       <eroshenkoam@qameta.io>
