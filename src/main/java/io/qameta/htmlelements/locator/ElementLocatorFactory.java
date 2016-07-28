@@ -7,5 +7,5 @@ import java.lang.reflect.Method;
 
 public interface ElementLocatorFactory {
 
-    ElementLocator createLocator(SearchContext searchContext, Method method);
+    ElementLocator createLocator(SearchContext searchContext, Annotations annotations);
 }

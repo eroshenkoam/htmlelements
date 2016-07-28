@@ -21,10 +21,6 @@ public class SmartElementLocator implements ElementLocator {
 
     private final Annotations annotations;
 
-    public SmartElementLocator(SearchContext searchContext, Method method) {
-        this(searchContext, new Annotations(method));
-    }
-
     public SmartElementLocator(SearchContext searchContext, Annotations annotations) {
         this.searchContext = searchContext;
         this.annotations = annotations;

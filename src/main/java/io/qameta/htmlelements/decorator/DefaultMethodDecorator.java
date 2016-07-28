@@ -3,7 +3,7 @@ package io.qameta.htmlelements.decorator;
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.handler.LocatingElementHandler;
 import io.qameta.htmlelements.handler.LocatingElementListHandler;
-import io.qameta.htmlelements.locator.ElementLocatorFactory;
+import io.qameta.htmlelements.locator.*;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
@@ -40,9 +40,9 @@ public class DefaultMethodDecorator implements MethodDecorator {
 
     @Override
     @SuppressWarnings("unchecked")
-    public Object decorate(SearchContext searchContext, Method method) {
-        ElementLocator locator = getLocatorFactory().createLocator(searchContext, method);
-        Class<?> returnType = method.getReturnType();
+    public Object decorate(SearchContext searchContext, Annotations annotations) {
+        ElementLocator locator = getLocatorFactory().createLocator(searchContext, annotations);
+        Class<?> returnType = annotations.getMethod().getReturnType();
 
         if (WebElement.class.isAssignableFrom(returnType)) {
             return Proxy.newProxyInstance(
@@ -53,7 +53,8 @@ public class DefaultMethodDecorator implements MethodDecorator {
         }
 
         if (List.class.isAssignableFrom(returnType)) {
-            Type methodReturnType = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments()[0];
+            Type methodReturnType = ((ParameterizedType) annotations.getMethod()
+                    .getGenericReturnType()).getActualTypeArguments()[0];
             return Proxy.newProxyInstance(
                     getClassLoader(),
                     new Class[]{List.class},

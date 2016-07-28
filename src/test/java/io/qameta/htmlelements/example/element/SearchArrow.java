@@ -10,7 +10,7 @@ import io.qameta.htmlelements.example.TestData;
 public interface SearchArrow extends WithSuggest {
 
 
-    @FindBy(TestData.SEARCH_FORM_XPATH)
+    @FindBy(TestData.SEARCH_FORM_TEMPLATE)
     SearchForm form(@Param("className") String className);
 
 }

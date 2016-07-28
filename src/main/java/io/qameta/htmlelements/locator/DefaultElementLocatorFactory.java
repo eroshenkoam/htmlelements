@@ -8,8 +8,8 @@ import java.lang.reflect.Method;
 public class DefaultElementLocatorFactory implements ElementLocatorFactory {
 
     @Override
-    public ElementLocator createLocator(SearchContext searchContext, Method method) {
-        return new SmartElementLocator(searchContext, method);
+    public ElementLocator createLocator(SearchContext searchContext, Annotations annotations) {
+        return new SmartElementLocator(searchContext, annotations);
     }
 
 }

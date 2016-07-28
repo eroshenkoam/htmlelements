@@ -1,6 +1,7 @@
 package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.decorator.MethodDecorator;
+import io.qameta.htmlelements.locator.*;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
@@ -45,7 +46,8 @@ public class LocatingElementHandler implements InvocationHandler {
         }
 
         if (getDecorator().canDecorate(method)) {
-            return getDecorator().decorate(getOriginalElement(), method);
+            Annotations annotations = new Annotations(method, args);
+            return getDecorator().decorate(getOriginalElement(), annotations);
         }
 
         throw new UnsupportedOperationException(String.format("Method '%s' is not implemented", method));

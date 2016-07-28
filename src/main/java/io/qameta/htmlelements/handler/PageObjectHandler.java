@@ -2,6 +2,7 @@ package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.context.WebPageContext;
 import io.qameta.htmlelements.decorator.MethodDecorator;
+import io.qameta.htmlelements.locator.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
@@ -37,7 +38,8 @@ public class PageObjectHandler implements InvocationHandler {
         }
 
         if (getDecorator().canDecorate(method)) {
-            return getDecorator().decorate(getContext().getDriver(), method);
+            Annotations annotations = new Annotations(method, args);
+            return getDecorator().decorate(getContext().getDriver(), annotations);
         }
 
         throw new UnsupportedOperationException(String.format("Method '%s' is not implemented", method));

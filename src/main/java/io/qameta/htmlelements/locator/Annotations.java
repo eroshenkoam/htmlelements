@@ -1,34 +1,37 @@
 package io.qameta.htmlelements.locator;
 
-import io.qameta.htmlelements.annotation.FindBy;
-import io.qameta.htmlelements.annotation.Param;
+import io.qameta.htmlelements.annotation.*;
 import org.openqa.selenium.By;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Parameter;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+
+import static io.qameta.htmlelements.util.ReflectionUtils.getParameters;
 
 public class Annotations {
 
     private final Method method;
 
-    public Annotations(Method method) {
+    private final Object[] args;
+
+    public Annotations(Method method, Object[] args) {
         this.method = method;
+        this.args = args;
     }
 
-    protected Method getMethod() {
+    public Method getMethod() {
         return method;
     }
 
     public By buildBy() {
         FindBy findBy = getMethod().getAnnotation(FindBy.class);
-        if (method.getParameters().length != 0) {
-            Parameter parameter = method.getParameters()[0];
-            System.out.println(parameter.getAnnotation(Param.class).value());
-        }
+        String locator = findBy.value();
 
-        return By.xpath(findBy.value());
+        Map<String, String> parameters = getParameters(method, args);
+        for (String key : parameters.keySet()) {
+            locator = locator.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+        }
+        return By.xpath(locator);
     }
 
     public List<WebElementValidator> getValidators() {
@@ -36,4 +39,5 @@ public class Annotations {
                 element -> element.isDisplayed() && element.isEnabled()
         );
     }
+
 }
