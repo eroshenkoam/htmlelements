@@ -1,6 +1,7 @@
 package io.qameta.htmlelements.decorator;
 
 import io.qameta.htmlelements.annotation.FindBy;
+import io.qameta.htmlelements.context.*;
 import io.qameta.htmlelements.handler.LocatingElementHandler;
 import io.qameta.htmlelements.handler.LocatingElementListHandler;
 import io.qameta.htmlelements.locator.*;
@@ -45,20 +46,22 @@ public class DefaultMethodDecorator implements MethodDecorator {
         Class<?> returnType = annotations.getMethod().getReturnType();
 
         if (WebElement.class.isAssignableFrom(returnType)) {
+            WebElementContext context = new WebElementContext(returnType, classLoader, locator);
             return Proxy.newProxyInstance(
                     getClassLoader(),
                     new Class[]{returnType},
-                    new LocatingElementHandler(locator, this)
+                    new LocatingElementHandler(context, this)
             );
         }
 
         if (List.class.isAssignableFrom(returnType)) {
             Type methodReturnType = ((ParameterizedType) annotations.getMethod()
                     .getGenericReturnType()).getActualTypeArguments()[0];
+            WebElementContext context = new WebElementContext((Class<?>) methodReturnType, classLoader, locator);
             return Proxy.newProxyInstance(
                     getClassLoader(),
                     new Class[]{List.class},
-                    new LocatingElementListHandler(locator, (Class<?>) methodReturnType, this, getClassLoader())
+                    new LocatingElementListHandler(context, this)
             );
         }
 

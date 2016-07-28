@@ -1,8 +1,9 @@
 package io.qameta.htmlelements.handler;
 
+import io.qameta.htmlelements.context.*;
 import io.qameta.htmlelements.decorator.MethodDecorator;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.openqa.selenium.support.pagefactory.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -13,45 +14,53 @@ import java.util.stream.Collectors;
 
 public class LocatingElementListHandler implements InvocationHandler {
 
+    private final WebElementContext context;
+
     private final MethodDecorator decorator;
 
-    private final ClassLoader classLoader;
-
-    private final ElementLocator locator;
-
-    private final Class<?> returnedType;
-
-    public LocatingElementListHandler(ElementLocator locator, Class<?> returnedType, MethodDecorator decorator, ClassLoader classLoader) {
-        this.returnedType = returnedType;
-        this.classLoader = classLoader;
+    public LocatingElementListHandler(WebElementContext context, MethodDecorator decorator) {
         this.decorator = decorator;
-        this.locator = locator;
+        this.context = context;
     }
 
-    public ElementLocator getLocator() {
-        return locator;
+    public WebElementContext getContext() {
+        return context;
     }
 
     public MethodDecorator getDecorator() {
         return decorator;
     }
 
-    public Class<?> getReturnedType() {
-        return returnedType;
-    }
-
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        List<WebElement> originalElements = getLocator().findElements();
+        List<WebElement> originalElements = getContext().getLocator().findElements();
+        Class<?> returnedType = getContext().getWebElementClass();
 
         List<Object> wrappedElements = originalElements.stream()
-                .map(element -> Proxy.newProxyInstance(classLoader, new Class[]{getReturnedType()},
-                        new LocatingElementHandler(element, getDecorator()))).collect(Collectors.toList());
+                .map(element -> Proxy.newProxyInstance(getContext().getClassLoader(), new Class[]{returnedType},
+                        new LocatingElementHandler(from(element, getContext()), getDecorator())))
+                .collect(Collectors.toList());
 
         try {
             return method.invoke(wrappedElements, args);
         } catch (InvocationTargetException e) {
             throw e.getCause();
         }
+    }
+
+    private static WebElementContext from(WebElement element, WebElementContext parent) {
+        ElementLocator locator = new ElementLocator() {
+            @Override
+            public WebElement findElement() {
+                return element;
+            }
+
+            @Override
+            public List<WebElement> findElements() {
+                return null;
+            }
+        };
+
+        return new WebElementContext(parent.getWebElementClass(), parent.getClassLoader(), locator);
     }
 }
