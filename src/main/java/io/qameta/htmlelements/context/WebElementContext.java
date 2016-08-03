@@ -1,6 +1,6 @@
 package io.qameta.htmlelements.context;
 
-import org.openqa.selenium.support.pagefactory.*;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 public class WebElementContext {
 

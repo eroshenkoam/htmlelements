@@ -1,9 +1,10 @@
 package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.context.WebPageContext;
-import io.qameta.htmlelements.decorator.*;
-import io.qameta.htmlelements.locator.*;
-import org.openqa.selenium.*;
+import io.qameta.htmlelements.decorator.MethodDecorator;
+import io.qameta.htmlelements.locator.Annotations;
+import org.openqa.selenium.SearchContext;
+import org.openqa.selenium.WebDriver;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;

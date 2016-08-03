@@ -1,9 +1,9 @@
 package io.qameta.htmlelements.handler;
 
-import io.qameta.htmlelements.context.*;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
+import io.qameta.htmlelements.context.WebElementContext;
 import io.qameta.htmlelements.decorator.MethodDecorator;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.pagefactory.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;

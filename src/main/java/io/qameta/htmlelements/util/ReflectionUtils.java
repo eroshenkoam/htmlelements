@@ -1,10 +1,12 @@
 package io.qameta.htmlelements.util;
 
-import io.qameta.htmlelements.annotation.*;
+import io.qameta.htmlelements.annotation.Param;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Method;
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.util.Arrays.stream;

@@ -8,7 +8,7 @@ import io.qameta.htmlelements.locator.DefaultElementLocatorFactory;
 import io.qameta.htmlelements.locator.ElementLocatorFactory;
 import org.openqa.selenium.WebDriver;
 
-import java.lang.reflect.*;
+import java.lang.reflect.Proxy;
 
 public class WebPageFactory {
 

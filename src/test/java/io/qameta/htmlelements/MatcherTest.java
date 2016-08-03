@@ -1,9 +1,9 @@
 package io.qameta.htmlelements;
 
-import io.qameta.htmlelements.example.*;
-import io.qameta.htmlelements.example.page.*;
-import org.junit.*;
-import org.openqa.selenium.*;
+import io.qameta.htmlelements.example.TestData;
+import io.qameta.htmlelements.example.page.SearchPage;
+import org.junit.Test;
+import org.openqa.selenium.WebDriver;
 
 import static io.qameta.htmlelements.matchers.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matchers.HasTextMatcher.hasText;

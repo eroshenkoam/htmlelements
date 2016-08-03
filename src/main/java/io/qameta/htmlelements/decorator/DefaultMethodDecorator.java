@@ -1,10 +1,12 @@
 package io.qameta.htmlelements.decorator;
 
 import io.qameta.htmlelements.annotation.FindBy;
-import io.qameta.htmlelements.context.*;
+import io.qameta.htmlelements.context.WebElementContext;
 import io.qameta.htmlelements.handler.LocatingElementHandler;
 import io.qameta.htmlelements.handler.LocatingElementListHandler;
-import io.qameta.htmlelements.locator.*;
+import io.qameta.htmlelements.locator.ElementLocatorFactory;
+import io.qameta.htmlelements.locator.Annotations;
+
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;

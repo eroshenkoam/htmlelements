@@ -1,6 +1,6 @@
 package io.qameta.htmlelements.locator;
 
-import io.qameta.htmlelements.annotation.*;
+import io.qameta.htmlelements.annotation.FindBy;
 import org.openqa.selenium.By;
 
 import java.lang.reflect.Method;

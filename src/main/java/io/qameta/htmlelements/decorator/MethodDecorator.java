@@ -1,6 +1,6 @@
 package io.qameta.htmlelements.decorator;
 
-import io.qameta.htmlelements.locator.*;
+import io.qameta.htmlelements.locator.Annotations;
 import org.openqa.selenium.SearchContext;
 
 import java.lang.reflect.Method;
