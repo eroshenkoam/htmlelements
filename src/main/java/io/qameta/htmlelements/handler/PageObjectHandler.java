@@ -1,11 +1,14 @@
 package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.context.WebPageContext;
-import io.qameta.htmlelements.decorator.MethodDecorator;
+import io.qameta.htmlelements.decorator.*;
 import io.qameta.htmlelements.locator.*;
+import org.openqa.selenium.*;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+
+import static io.qameta.htmlelements.util.ReflectionUtils.getAllMethods;
 
 public class PageObjectHandler implements InvocationHandler {
 
@@ -29,19 +32,25 @@ public class PageObjectHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
+        // Context
         if ("toString".equals(method.getName())) {
             return String.format("Proxy for web page '%s'", getContext().getWebPageClass().getName());
         }
 
-        if ("getDriver".equals(method.getName())) {
-            return getContext().getDriver();
+        // WebDriver
+        if (getAllMethods(WebDriver.class).contains(method)) {
+            WebDriver driver = getContext().getDriver();
+            return method.invoke(driver, args);
         }
 
+        // Decorator (many decorators?) may be we can create decorator here?
         if (getDecorator().canDecorate(method)) {
+            SearchContext searchContext = getContext().getDriver();
             Annotations annotations = new Annotations(method, args);
-            return getDecorator().decorate(getContext().getDriver(), annotations);
+            return getDecorator().decorate(searchContext, annotations);
         }
 
+        // Last chance
         throw new UnsupportedOperationException(String.format("Method '%s' is not implemented", method));
     }
 }

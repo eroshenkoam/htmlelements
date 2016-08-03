@@ -32,7 +32,10 @@ public class TestData {
         when(textInput.isEnabled()).thenReturn(false, false, false, false, true);
 
         WebElement searchForm = createWebElement("search form");
-        WebElement searchArrow = createWebElement("search arrow");
+
+        WebElement searchArrow = mock(WebElement.class);
+        when(searchArrow.isDisplayed()).thenReturn(true);
+        when(searchArrow.getText()).thenReturn("search-arro", "search", "search-arrow");
 
         List<WebElement> suggest = Arrays.asList(
                 createWebElement("first suggest"),

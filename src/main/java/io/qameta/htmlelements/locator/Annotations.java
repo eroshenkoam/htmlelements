@@ -34,10 +34,4 @@ public class Annotations {
         return By.xpath(locator);
     }
 
-    public List<WebElementValidator> getValidators() {
-        return Collections.singletonList(
-                element -> element.isDisplayed() && element.isEnabled()
-        );
-    }
-
 }

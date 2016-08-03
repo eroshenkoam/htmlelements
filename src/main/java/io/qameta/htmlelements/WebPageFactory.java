@@ -30,7 +30,7 @@ public class WebPageFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends WebPage> T get(Class<T> pageObjectClass) throws Exception {
+    public <T extends WebPage> T get(Class<T> pageObjectClass) {
         ElementLocatorFactory locatorFactory = new DefaultElementLocatorFactory();
         MethodDecorator decorator = new DefaultMethodDecorator(locatorFactory, getClassLoader());
         WebPageContext context = new WebPageContext(pageObjectClass, getDriver());
