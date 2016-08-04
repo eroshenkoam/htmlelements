@@ -23,6 +23,10 @@ public class PageObjectHandler extends ComplexHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         // WebDriver
+        if ("getWrappedDriver".equals(method.getName())) {
+            return getContext().getDriver();
+        }
+
         if (getAllMethods(WebDriver.class).contains(method)) {
             WebDriver driver = getContext().getDriver();
             return method.invoke(driver, args);
