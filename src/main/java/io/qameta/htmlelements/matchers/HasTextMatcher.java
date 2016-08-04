@@ -11,7 +11,7 @@ import static org.hamcrest.core.Is.is;
 public class HasTextMatcher extends TypeSafeMatcher<WebElement> {
     private final Matcher<String> textMatcher;
 
-    HasTextMatcher(Matcher<String> textMatcher) {
+    private HasTextMatcher(Matcher<String> textMatcher) {
         this.textMatcher = textMatcher;
     }
 

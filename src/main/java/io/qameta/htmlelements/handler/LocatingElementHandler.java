@@ -1,38 +1,27 @@
 package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.context.WebElementContext;
-import io.qameta.htmlelements.decorator.MethodDecorator;
-import io.qameta.htmlelements.locator.Annotations;
-import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
-import org.hamcrest.Matcher;
+import org.openqa.selenium.support.pagefactory.ElementLocator;
+import org.openqa.selenium.support.ui.Clock;
+import org.openqa.selenium.support.ui.SystemClock;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
+import java.util.concurrent.TimeUnit;
 
-import static io.qameta.htmlelements.matchers.WaiterMatcherDecorator.withWaitFor;
 import static io.qameta.htmlelements.util.ReflectionUtils.getAllMethods;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assume.assumeThat;
 
-public class LocatingElementHandler implements InvocationHandler {
-
-    private final MethodDecorator decorator;
+class LocatingElementHandler extends ComplexHandler {
 
     private final WebElementContext context;
 
-    public LocatingElementHandler(WebElementContext context, MethodDecorator decorator) {
-        this.decorator = decorator;
+    LocatingElementHandler(WebElementContext context) {
         this.context = context;
     }
 
-    public WebElementContext getContext() {
+    private WebElementContext getContext() {
         return context;
-    }
-
-    public MethodDecorator getDecorator() {
-        return decorator;
     }
 
     @Override
@@ -41,39 +30,28 @@ public class LocatingElementHandler implements InvocationHandler {
 
         // Proxy
         if (getAllMethods(WebElement.class).contains(method)) {
-            WebElement element = getContext().getLocator().findElement();
-            return method.invoke(element, args);
+            return invokeWebElementMethod(method, args, getContext().getLocator());
         }
 
-        // Decorator
-        if ("waitUntil".equals(method.getName())) {
-            Matcher<WebElement> matcher = (Matcher<WebElement>) args[0];
-            assumeThat((WebElement) proxy, withWaitFor(matcher));
-            return proxy;
-        }
+        return super.invoke(proxy, method, args);
+    }
 
-        // Decorator
-        if ("should".equals(method.getName())) {
-            Matcher<WebElement> matcher = (Matcher<WebElement>) args[0];
-            assertThat((WebElement) proxy, withWaitFor(matcher));
-            return proxy;
-        }
+    private Object invokeWebElementMethod(Method method, Object[] args, ElementLocator locator) throws Throwable {
+        Clock clock = new SystemClock();
+        long end = clock.laterBy(TimeUnit.SECONDS.toMillis(5000));
 
-        // Decorator
-        if (getDecorator().canDecorate(method)) {
-            Annotations annotations = new Annotations(method, args);
-            return getDecorator().decorate((SearchContext) proxy, annotations);
+        Throwable lasException = null;
+        while (clock.isNowBefore(end)) {
+            try {
+                WebElement element = locator.findElement();
+                return method.invoke(element, args);
+            } catch (Throwable e) {
+                lasException = e;
+            } finally {
+                Thread.sleep(250);
+            }
         }
-
-        // Decorator
-        if ("toString".equals(method.getName())) {
-            return String.format("Proxy for web element '%s'", getContext().getWebElementClass());
-        }
-
-        // Last chance
-        throw new UnsupportedOperationException(String.format("Method '%s.%s' is not implemented",
-                getContext().getWebElementClass().getName(),
-                method.getName()));
+        throw lasException;
     }
 
 }

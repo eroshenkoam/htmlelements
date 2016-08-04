@@ -19,6 +19,10 @@ public class Annotations {
         this.args = args;
     }
 
+    public Object[] getArgs() {
+        return args;
+    }
+
     public Method getMethod() {
         return method;
     }

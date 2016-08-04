@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.matchers;
 
-
 import org.hamcrest.Description;
 import org.hamcrest.Factory;
 import org.hamcrest.Matcher;
@@ -9,6 +8,10 @@ import org.openqa.selenium.WebDriverException;
 import org.openqa.selenium.WebElement;
 
 public class DisplayedMatcher extends TypeSafeMatcher<WebElement> {
+
+    private DisplayedMatcher() {
+    }
+
     @Override
     protected boolean matchesSafely(WebElement element) {
         try {

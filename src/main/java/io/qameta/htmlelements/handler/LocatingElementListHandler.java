@@ -2,7 +2,6 @@ package io.qameta.htmlelements.handler;
 
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import io.qameta.htmlelements.context.WebElementContext;
-import io.qameta.htmlelements.decorator.MethodDecorator;
 import org.openqa.selenium.WebElement;
 
 import java.lang.reflect.InvocationHandler;
@@ -12,23 +11,16 @@ import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class LocatingElementListHandler implements InvocationHandler {
+class LocatingElementListHandler implements InvocationHandler {
 
     private final WebElementContext context;
 
-    private final MethodDecorator decorator;
-
-    public LocatingElementListHandler(WebElementContext context, MethodDecorator decorator) {
-        this.decorator = decorator;
+    LocatingElementListHandler(WebElementContext context) {
         this.context = context;
     }
 
-    public WebElementContext getContext() {
+    private WebElementContext getContext() {
         return context;
-    }
-
-    public MethodDecorator getDecorator() {
-        return decorator;
     }
 
     @Override
@@ -38,7 +30,7 @@ public class LocatingElementListHandler implements InvocationHandler {
 
         List<Object> wrappedElements = originalElements.stream()
                 .map(element -> Proxy.newProxyInstance(getContext().getClassLoader(), new Class[]{returnedType},
-                        new LocatingElementHandler(from(element, getContext()), getDecorator())))
+                        new LocatingElementHandler(from(element, getContext()))))
                 .collect(Collectors.toList());
 
         try {

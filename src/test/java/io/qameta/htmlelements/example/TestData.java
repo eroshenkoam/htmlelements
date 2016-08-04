@@ -1,5 +1,7 @@
 package io.qameta.htmlelements.example;
 
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -31,7 +33,19 @@ public class TestData {
         WebElement textInput = createWebElement("text input");
         when(textInput.isEnabled()).thenReturn(false, false, false, false, true);
 
-        WebElement searchForm = createWebElement("search form");
+        WebElement searchForm = mock(WebElement.class);
+        when(searchForm.getText()).then(new Answer<String>() {
+
+            private int count = 0;
+
+            @Override
+            public String answer(InvocationOnMock invocationOnMock) throws Throwable {
+                if (count++ % 3 == 0) {
+                    throw new Exception("");
+                }
+                return "search form";
+            }
+        });
 
         WebElement searchArrow = mock(WebElement.class);
         when(searchArrow.isDisplayed()).thenReturn(true);

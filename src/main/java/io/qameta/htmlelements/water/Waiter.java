@@ -1,13 +1,15 @@
-package io.qameta.htmlelements.matchers;
+package io.qameta.htmlelements.water;
 
 import org.hamcrest.SelfDescribing;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
 public abstract class Waiter implements SelfDescribing {
-    private static final long DEFAULT_POLLING_INTERVAL = SECONDS.toMillis(1);
+
+    private static final long DEFAULT_POLLING_INTERVAL = SECONDS.toMillis(250);
 
     private long pollingInterval;
+
     private long startTime;
 
     protected Waiter() {
