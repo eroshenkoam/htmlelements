@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static io.qameta.htmlelements.matchers.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matchers.HasTextMatcher.hasText;
+import static org.hamcrest.Matchers.hasSize;
 
 public class MatcherTest {
 
@@ -20,6 +21,8 @@ public class MatcherTest {
         searchPage.searchArrow()
                 .waitUntil(displayed())
                 .should(hasText("search-arrow"));
+
+        searchPage.searchArrow().suggest();
 
     }
 }

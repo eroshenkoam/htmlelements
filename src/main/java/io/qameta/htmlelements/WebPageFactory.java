@@ -8,17 +8,10 @@ import java.lang.reflect.Proxy;
 
 public class WebPageFactory {
 
-    private final WebDriver driver;
-
     private ClassLoader classLoader;
 
-    public WebPageFactory(WebDriver driver, ClassLoader classLoader) {
+    public WebPageFactory(ClassLoader classLoader) {
         this.classLoader = classLoader;
-        this.driver = driver;
-    }
-
-    protected WebDriver getDriver() {
-        return driver;
     }
 
     protected ClassLoader getClassLoader() {
@@ -26,8 +19,8 @@ public class WebPageFactory {
     }
 
     @SuppressWarnings("unchecked")
-    public <T extends WebPage> T get(Class<T> pageObjectClass) {
-        WebPageContext context = new WebPageContext(pageObjectClass, getDriver());
+    public <T extends WebPage> T get(WebDriver driver, Class<T> pageObjectClass) {
+        WebPageContext context = new WebPageContext(pageObjectClass, driver);
 
         return (T) Proxy.newProxyInstance(
                 getClassLoader(),
