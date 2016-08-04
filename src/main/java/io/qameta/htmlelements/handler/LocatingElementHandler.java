@@ -38,7 +38,7 @@ class LocatingElementHandler extends ComplexHandler {
 
     private Object invokeWebElementMethod(Method method, Object[] args, ElementLocator locator) throws Throwable {
         Clock clock = new SystemClock();
-        long end = clock.laterBy(TimeUnit.SECONDS.toMillis(5000));
+        long end = clock.laterBy(TimeUnit.SECONDS.toMillis(5));
 
         Throwable lasException = null;
         while (clock.isNowBefore(end)) {
