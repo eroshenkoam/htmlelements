@@ -64,7 +64,6 @@ public class TestData {
 
         WebDriver driver = mock(WebDriver.class);
         when(driver.findElement(By.xpath(SEARCH_ARROW_XPATH))).thenReturn(searchArrow);
-        when(driver.findElement(any())).thenThrow(new NoSuchElementException());
 
         return driver;
     }

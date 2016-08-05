@@ -5,6 +5,9 @@ import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 
+import static io.qameta.htmlelements.matchers.DisplayedMatcher.displayed;
+import static org.hamcrest.Matchers.everyItem;
+
 /**
  * @author Artem Eroshenko <erosenkoam@me.com>
  */
@@ -21,6 +24,7 @@ public class SimpleTest {
         System.out.println(searchPage.toString());
         System.out.println(searchPage.searchArrow().form("form").getText());
 
-        System.out.println(searchPage.searchArrow().suggest().stream().findFirst().get().getText());
+        searchPage.searchArrow().suggest()
+                .waitUntil(everyItem(displayed()));
     }
 }

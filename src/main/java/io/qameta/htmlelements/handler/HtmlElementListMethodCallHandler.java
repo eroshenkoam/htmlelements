@@ -33,7 +33,7 @@ class HtmlElementListMethodCallHandler implements MethodCallHandler {
         WebElementContext context = new WebElementContext((Class<?>) methodReturnType, classLoader, locator);
         return Proxy.newProxyInstance(
                 classLoader,
-                new Class[]{List.class},
+                new Class[]{annotations.getMethod().getReturnType()},
                 new LocatingElementListHandler(context)
         );
     }

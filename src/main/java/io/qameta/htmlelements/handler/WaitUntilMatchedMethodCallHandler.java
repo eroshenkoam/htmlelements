@@ -1,7 +1,7 @@
 package io.qameta.htmlelements.handler;
 
 import org.hamcrest.Matcher;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.ui.Clock;
 import org.openqa.selenium.support.ui.SystemClock;
 
@@ -9,13 +9,11 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
-class ShouldMatched implements ByNameMethodCallHandler {
+class WaitUntilMatchedMethodCallHandler implements ByNameMethodCallHandler {
 
     @Override
     public String getHandleMethodName() {
-        return "should";
+        return "waitUntil";
     }
 
     @Override
@@ -27,10 +25,11 @@ class ShouldMatched implements ByNameMethodCallHandler {
         Throwable lasException = null;
         while (clock.isNowBefore(end)) {
             try {
-                Arrays.stream((Matcher<WebElement>[]) args[0]).forEach(matcher -> {
-                    assertThat((WebElement) proxy, matcher);
-                });
-                return proxy;
+                if (Arrays.stream((Matcher[]) args[0]).allMatch(matcher -> matcher.matches(proxy))) {
+                    return proxy;
+                } else {
+                    throw new NoSuchElementException("No such element exception");
+                }
             } catch (Throwable e) {
                 lasException = e;
             } finally {
@@ -38,5 +37,7 @@ class ShouldMatched implements ByNameMethodCallHandler {
             }
         }
         throw lasException;
+
     }
+
 }

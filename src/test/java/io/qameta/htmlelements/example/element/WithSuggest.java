@@ -2,6 +2,7 @@ package io.qameta.htmlelements.example.element;
 
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.element.HtmlElement;
+import io.qameta.htmlelements.element.HtmlElementList;
 import io.qameta.htmlelements.example.TestData;
 
 import java.util.List;
@@ -12,6 +13,6 @@ import java.util.List;
 public interface WithSuggest extends HtmlElement {
 
     @FindBy(TestData.SUGGEST_XPATH)
-    List<HtmlElement> suggest();
+    HtmlElementList<HtmlElement> suggest();
 
 }

@@ -2,8 +2,8 @@ package io.qameta.htmlelements.element;
 
 import org.hamcrest.Matcher;
 
-interface ShouldMatched<T, R> {
+interface ShouldMatched<T> {
 
-    R should(Matcher<T>... matcher);
+    T should(Matcher... matcher);
 
 }

@@ -2,8 +2,8 @@ package io.qameta.htmlelements.element;
 
 import org.hamcrest.Matcher;
 
-interface WaitUntilMatched<T> {
+public interface FilterMatched<T> {
 
-    T waitUntil(Matcher... matcher);
+    T filter(Matcher... matcher);
 
 }
