@@ -6,7 +6,6 @@ class ToStringMethodCallHandler implements ByNameMethodCallHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        System.out.println(method);
         return "Proxy element";
     }
 

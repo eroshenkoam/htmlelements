@@ -2,8 +2,12 @@ package io.qameta.htmlelements.element;
 
 import org.hamcrest.Matcher;
 
-interface WaitUntilMatched<T, R>{
+import java.util.function.Predicate;
 
-    R waitUntil(Matcher<T> matcher);
+interface WaitUntilMatched<T, R> {
+
+    R waitUntil(Matcher<T>... matchers);
+
+    R waitUntil(Predicate<T>... matchers);
 
 }

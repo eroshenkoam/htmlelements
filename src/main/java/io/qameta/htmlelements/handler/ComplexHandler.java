@@ -21,8 +21,8 @@ class ComplexHandler implements InvocationHandler {
         List<MethodCallHandler> handlers = Arrays.asList(
                 new DefaultMethodCallHandler(),
                 new ToStringMethodCallHandler(),
-                new ShouldMethodCallHandler(),
-                new WaitUntilMethodCallHandler(),
+                new ShouldMatched(),
+                new WaitUntilMatched(),
                 new HtmlElementMethodCallHandler(),
                 new HtmlElementListMethodCallHandler()
         );

@@ -8,7 +8,9 @@ import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.NoSuchElementException;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -62,6 +64,7 @@ public class TestData {
 
         WebDriver driver = mock(WebDriver.class);
         when(driver.findElement(By.xpath(SEARCH_ARROW_XPATH))).thenReturn(searchArrow);
+        when(driver.findElement(any())).thenThrow(new NoSuchElementException());
 
         return driver;
     }

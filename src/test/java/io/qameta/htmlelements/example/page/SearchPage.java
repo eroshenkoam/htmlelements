@@ -1,6 +1,7 @@
 package io.qameta.htmlelements.example.page;
 
 import io.qameta.htmlelements.annotation.FindBy;
+import io.qameta.htmlelements.annotation.Name;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.element.SearchArrow;
 import io.qameta.htmlelements.WebPage;
