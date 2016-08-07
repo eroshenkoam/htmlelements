@@ -1,13 +1,10 @@
 package io.qameta.htmlelements.handler;
 
+import io.qameta.htmlelements.water.SlowLoadableComponent;
 import org.hamcrest.Matcher;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.Clock;
-import org.openqa.selenium.support.ui.SystemClock;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -19,22 +16,13 @@ class ShouldMatchedMethodCallHandler implements ByNameMethodCallHandler {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        Clock clock = new SystemClock();
-        long end = clock.laterBy(TimeUnit.SECONDS.toMillis(5));
-
-        Throwable lasException = null;
-        while (clock.isNowBefore(end)) {
-            try {
-                Arrays.stream((Matcher[]) args[0]).forEach(matcher -> assertThat(proxy, matcher));
-                return proxy;
-            } catch (Throwable e) {
-                lasException = e;
-            } finally {
-                Thread.sleep(250);
-            }
-        }
-        throw lasException;
+        Matcher[] matcherList = (Matcher[]) args[0];
+        return ((SlowLoadableComponent<Object>) () -> {
+            Arrays.stream(matcherList).forEach(matcher -> {
+                assertThat(proxy, matcher);
+            });
+            return proxy;
+        }).get();
     }
 }

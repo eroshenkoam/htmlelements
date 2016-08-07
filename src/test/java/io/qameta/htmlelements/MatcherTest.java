@@ -19,10 +19,11 @@ public class MatcherTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testOutput() throws Exception {
-        WebPageFactory pageObjectFactory = new WebPageFactory(ClassLoader.getSystemClassLoader());
+        WebPageFactory pageObjectFactory = new WebPageFactory();
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
         searchPage.searchArrow()
+                .waitUntil(displayed())
                 .should(displayed(), hasText("search-arrow"));
 
     }

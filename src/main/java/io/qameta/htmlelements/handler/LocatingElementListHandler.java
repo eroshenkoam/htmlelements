@@ -1,12 +1,12 @@
 package io.qameta.htmlelements.handler;
 
+import io.qameta.htmlelements.proxies.Proxies;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import io.qameta.htmlelements.context.WebElementContext;
 import org.openqa.selenium.WebElement;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,22 +26,27 @@ class LocatingElementListHandler extends ComplexHandler {
 
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-        List<WebElement> originalElements = getContext().getLocator().findElements();
-        Class<?> returnedType = getContext().getWebElementClass();
 
         if (getAllMethods(List.class).contains(method)) {
-            List<Object> wrappedElements = originalElements.stream()
-                    .map(element -> Proxy.newProxyInstance(getContext().getClassLoader(), new Class[]{returnedType},
-                            new LocatingElementHandler(from(element, getContext()))))
-                    .collect(Collectors.toList());
-            try {
-                return method.invoke(wrappedElements, args);
-            } catch (InvocationTargetException e) {
-                throw e.getCause();
-            }
+            invokeProxyMethod(getContext().getLocator(), method, args);
         }
 
         return super.invoke(proxy, method, args);
+    }
+
+    private Object invokeProxyMethod(ElementLocator locator, Method method, Object[] args) throws Throwable {
+        List<WebElement> originalElements = locator.findElements();
+        Class<?> returnedType = getContext().getWebElementClass();
+
+        List<Object> wrappedElements = originalElements.stream()
+                .map(element -> Proxies.simpleProxy(returnedType,
+                        new LocatingElementHandler(from(element, getContext()))))
+                .collect(Collectors.toList());
+        try {
+            return method.invoke(wrappedElements, args);
+        } catch (InvocationTargetException e) {
+            throw e.getCause();
+        }
     }
 
     private static WebElementContext from(WebElement element, WebElementContext parent) {
@@ -57,6 +62,6 @@ class LocatingElementListHandler extends ComplexHandler {
             }
         };
 
-        return new WebElementContext(parent.getWebElementClass(), parent.getClassLoader(), locator);
+        return new WebElementContext(parent.getWebElementClass(), locator);
     }
 }

@@ -4,12 +4,12 @@ import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.WebElementContext;
 import io.qameta.htmlelements.locator.Annotations;
 import io.qameta.htmlelements.locator.DefaultElementLocator;
+import io.qameta.htmlelements.proxies.Proxies;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import java.lang.reflect.Method;
-import java.lang.reflect.Proxy;
 
 class HtmlElementMethodCallHandler implements MethodCallHandler {
 
@@ -24,11 +24,7 @@ class HtmlElementMethodCallHandler implements MethodCallHandler {
         ElementLocator locator = new DefaultElementLocator((SearchContext) proxy, annotations);
         Class<?> returnType = method.getReturnType();
 
-        WebElementContext context = new WebElementContext(returnType, returnType.getClassLoader(), locator);
-        return Proxy.newProxyInstance(
-                returnType.getClassLoader(),
-                new Class[]{returnType},
-                new LocatingElementHandler(context)
-        );
+        WebElementContext context = new WebElementContext(returnType, locator);
+        return Proxies.simpleProxy(method.getReturnType(), new LocatingElementHandler(context));
     }
 }

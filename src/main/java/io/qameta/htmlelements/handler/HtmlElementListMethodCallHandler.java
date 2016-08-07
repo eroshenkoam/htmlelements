@@ -4,12 +4,12 @@ import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.WebElementContext;
 import io.qameta.htmlelements.locator.Annotations;
 import io.qameta.htmlelements.locator.DefaultElementLocator;
+import io.qameta.htmlelements.proxies.Proxies;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.List;
 
@@ -28,13 +28,7 @@ class HtmlElementListMethodCallHandler implements MethodCallHandler {
         Type methodReturnType = ((ParameterizedType) annotations.getMethod()
                 .getGenericReturnType()).getActualTypeArguments()[0];
 
-        ClassLoader classLoader = ((Class<?>)methodReturnType).getClassLoader();
-
-        WebElementContext context = new WebElementContext((Class<?>) methodReturnType, classLoader, locator);
-        return Proxy.newProxyInstance(
-                classLoader,
-                new Class[]{annotations.getMethod().getReturnType()},
-                new LocatingElementListHandler(context)
-        );
+        WebElementContext context = new WebElementContext((Class<?>) methodReturnType, locator);
+        return Proxies.simpleProxy(method.getReturnType(), new LocatingElementListHandler(context));
     }
 }
