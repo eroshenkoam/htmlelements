@@ -1,4 +1,4 @@
-package io.qameta.htmlelements.proxies;
+package io.qameta.htmlelements.proxy;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Proxy;

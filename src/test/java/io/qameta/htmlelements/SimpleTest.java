@@ -5,7 +5,7 @@ import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 
-import static io.qameta.htmlelements.matchers.DisplayedMatcher.displayed;
+import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static org.hamcrest.Matchers.everyItem;
 
 /**

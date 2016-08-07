@@ -4,7 +4,7 @@ import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.WebElementContext;
 import io.qameta.htmlelements.locator.Annotations;
 import io.qameta.htmlelements.locator.DefaultElementLocator;
-import io.qameta.htmlelements.proxies.Proxies;
+import io.qameta.htmlelements.proxy.Proxies;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.pagefactory.ElementLocator;

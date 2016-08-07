@@ -1,4 +1,4 @@
-package io.qameta.htmlelements.matchers;
+package io.qameta.htmlelements.matcher;
 
 import org.hamcrest.Description;
 import org.hamcrest.Factory;

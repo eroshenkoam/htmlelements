@@ -1,6 +1,6 @@
 package io.qameta.htmlelements.handler;
 
-import io.qameta.htmlelements.proxies.Proxies;
+import io.qameta.htmlelements.proxy.Proxies;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import io.qameta.htmlelements.context.WebElementContext;
 import org.openqa.selenium.WebElement;
@@ -28,7 +28,7 @@ class LocatingElementListHandler extends ComplexHandler {
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
         if (getAllMethods(List.class).contains(method)) {
-            invokeProxyMethod(getContext().getLocator(), method, args);
+            return invokeProxyMethod(getContext().getLocator(), method, args);
         }
 
         return super.invoke(proxy, method, args);

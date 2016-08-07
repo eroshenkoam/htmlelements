@@ -2,7 +2,7 @@ package io.qameta.htmlelements;
 
 import io.qameta.htmlelements.context.WebPageContext;
 import io.qameta.htmlelements.handler.PageObjectHandler;
-import io.qameta.htmlelements.proxies.Proxies;
+import io.qameta.htmlelements.proxy.Proxies;
 import org.openqa.selenium.WebDriver;
 
 public class WebPageFactory {
