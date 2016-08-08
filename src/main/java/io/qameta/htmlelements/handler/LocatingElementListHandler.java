@@ -27,8 +27,10 @@ class LocatingElementListHandler extends ComplexHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        if (getAllMethods(List.class).contains(method)) {
-            return invokeProxyMethod(getContext().getLocator(), method, args);
+        Class<?> proxyClass = List.class;
+
+        if (getAllMethods(proxyClass).contains(method)) {
+            return  invokeProxyMethod(getContext().getLocator(), method, args);
         }
 
         return super.invoke(proxy, method, args);
@@ -40,7 +42,7 @@ class LocatingElementListHandler extends ComplexHandler {
 
         List<Object> wrappedElements = originalElements.stream()
                 .map(element -> Proxies.simpleProxy(returnedType,
-                        new LocatingElementHandler(from(element, getContext()))))
+                        new LocatingElementHandler(from(element))))
                 .collect(Collectors.toList());
         try {
             return method.invoke(wrappedElements, args);
@@ -49,8 +51,8 @@ class LocatingElementListHandler extends ComplexHandler {
         }
     }
 
-    private static WebElementContext from(WebElement element, WebElementContext parent) {
-        ElementLocator locator = new ElementLocator() {
+    private static ElementLocator from(WebElement element) {
+        return new ElementLocator() {
             @Override
             public WebElement findElement() {
                 return element;
@@ -61,7 +63,5 @@ class LocatingElementListHandler extends ComplexHandler {
                 return null;
             }
         };
-
-        return new WebElementContext(parent.getWebElementClass(), locator);
     }
 }

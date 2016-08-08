@@ -21,7 +21,6 @@ public class SimpleTest {
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
 
-        System.out.println(searchPage.toString());
         System.out.println(searchPage.searchArrow().form("form").getText());
         System.out.println(searchPage.searchArrow().form("form").input().getText());
 

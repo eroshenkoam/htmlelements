@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.handler;
 
-import io.qameta.htmlelements.context.WebElementContext;
 import io.qameta.htmlelements.water.SlowLoadableComponent;
 import org.openqa.selenium.WebElement;
 
@@ -12,22 +11,24 @@ import static io.qameta.htmlelements.util.ReflectionUtils.getAllMethods;
 
 class LocatingElementHandler extends ComplexHandler {
 
-    private final WebElementContext context;
+    private final ElementLocator locator;
 
-    LocatingElementHandler(WebElementContext context) {
-        this.context = context;
+    LocatingElementHandler(ElementLocator locator) {
+        this.locator = locator;
     }
 
-    private WebElementContext getContext() {
-        return context;
+    private ElementLocator getLocator() {
+        return locator;
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        if (getAllMethods(WebElement.class).contains(method)) {
-            return invokeProxyMethod(getContext().getLocator(), method, args);
+        Class<?> proxyClass = WebElement.class;
+
+        if (getAllMethods(proxyClass).contains(method)) {
+            return invokeProxyMethod(getLocator(), method, args);
         }
 
         return super.invoke(proxy, method, args);
@@ -39,5 +40,4 @@ class LocatingElementHandler extends ComplexHandler {
             return method.invoke(element, args);
         }).get();
     }
-
 }

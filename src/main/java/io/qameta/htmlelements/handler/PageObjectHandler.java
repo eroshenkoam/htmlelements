@@ -1,38 +1,37 @@
 package io.qameta.htmlelements.handler;
 
-import io.qameta.htmlelements.context.WebPageContext;
 import org.openqa.selenium.WebDriver;
 
 import java.lang.reflect.Method;
+import java.util.function.Supplier;
 
 import static io.qameta.htmlelements.util.ReflectionUtils.getAllMethods;
 
 public class PageObjectHandler extends ComplexHandler {
 
-    private final WebPageContext context;
+    private final Supplier<WebDriver> supplier;
 
-    public PageObjectHandler(WebPageContext context) {
-        this.context = context;
+    public PageObjectHandler(Supplier<WebDriver> supplier) {
+        this.supplier = supplier;
     }
 
-    private WebPageContext getContext() {
-        return context;
+    private Supplier<WebDriver> getSupplier() {
+        return supplier;
     }
 
     @Override
-    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+    public Object invoke(Object object, Method method, Object[] args) throws Throwable {
 
-        // WebDriver
-        if ("getWrappedDriver".equals(method.getName())) {
-            return getContext().getDriver();
+        Class<?> proxyClass = WebDriver.class;
+
+        if (getAllMethods(proxyClass).contains(method)) {
+            return invokeSupplierMethod(getSupplier(), method, args);
         }
 
-        if (getAllMethods(WebDriver.class).contains(method)) {
-            WebDriver driver = getContext().getDriver();
-            return method.invoke(driver, args);
-        }
+        return super.invoke(object, method, args);
+    }
 
-        return super.invoke(proxy, method, args);
-
+    private <T> Object invokeSupplierMethod(Supplier<T> supplier, Method method, Object[] args) throws Throwable {
+        return method.invoke(supplier.get(), args);
     }
 }

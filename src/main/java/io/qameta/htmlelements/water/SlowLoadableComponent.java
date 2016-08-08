@@ -11,7 +11,6 @@ public interface SlowLoadableComponent<T> {
     default T get() throws Throwable {
         Clock clock = new SystemClock();
         long end = clock.laterBy(TimeUnit.SECONDS.toMillis(5));
-
         do {
             try {
                 return getSafely();
@@ -23,7 +22,6 @@ public interface SlowLoadableComponent<T> {
                 }
             }
         } while ((clock.isNowBefore(end)));
-
         return getSafely();
     }
 

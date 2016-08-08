@@ -24,7 +24,6 @@ class HtmlElementMethodCallHandler implements MethodCallHandler {
         ElementLocator locator = new DefaultElementLocator((SearchContext) proxy, annotations);
         Class<?> returnType = method.getReturnType();
 
-        WebElementContext context = new WebElementContext(returnType, locator);
-        return Proxies.simpleProxy(method.getReturnType(), new LocatingElementHandler(context));
+        return Proxies.simpleProxy(method.getReturnType(), new LocatingElementHandler(locator));
     }
 }
