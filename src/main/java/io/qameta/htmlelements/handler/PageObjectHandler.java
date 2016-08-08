@@ -24,6 +24,10 @@ public class PageObjectHandler extends ComplexHandler {
 
         Class<?> proxyClass = WebDriver.class;
 
+        if (method.getReturnType().isAssignableFrom(proxyClass)) {
+            return getSupplier().get();
+        }
+
         if (getAllMethods(proxyClass).contains(method)) {
             return invokeSupplierMethod(getSupplier(), method, args);
         }

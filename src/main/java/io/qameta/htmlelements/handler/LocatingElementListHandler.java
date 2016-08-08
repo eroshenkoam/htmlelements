@@ -1,12 +1,15 @@
 package io.qameta.htmlelements.handler;
 
+import io.qameta.htmlelements.element.HtmlElementList;
 import io.qameta.htmlelements.proxy.Proxies;
+import org.hamcrest.Matcher;
 import org.openqa.selenium.support.pagefactory.ElementLocator;
 import io.qameta.htmlelements.context.WebElementContext;
 import org.openqa.selenium.WebElement;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,11 +33,29 @@ class LocatingElementListHandler extends ComplexHandler {
         Class<?> proxyClass = List.class;
 
         if (getAllMethods(proxyClass).contains(method)) {
-            return  invokeProxyMethod(getContext().getLocator(), method, args);
+            return invokeProxyMethod(getContext().getLocator(), method, args);
+        }
+
+        if ("filter".equals(method.getName())) {
+            List<?> wrappedElements = invokeFilterMethod(getContext().getLocator(), method, args);
+            return Proxies.targetProxy(HtmlElementList.class, wrappedElements);
         }
 
         return super.invoke(proxy, method, args);
     }
+
+    private List<?> invokeFilterMethod(ElementLocator locator, Method method, Object[] args) throws Throwable {
+        Matcher[] matchers = (Matcher[]) args[0];
+        List<WebElement> originalElements = locator.findElements();
+
+        Class<?> returnedType = getContext().getWebElementClass();
+        return originalElements.stream()
+                .filter(element -> Arrays.stream(matchers).allMatch(matcher -> matcher.matches(element)))
+                .map(element -> Proxies.simpleProxy(returnedType,
+                        new LocatingElementHandler(from(element))))
+                .collect(Collectors.toList());
+    }
+
 
     private Object invokeProxyMethod(ElementLocator locator, Method method, Object[] args) throws Throwable {
         List<WebElement> originalElements = locator.findElements();

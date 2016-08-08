@@ -25,6 +25,6 @@ public class SimpleTest {
         System.out.println(searchPage.searchArrow().form("form").input().getText());
 
         searchPage.searchArrow().suggest()
-                .waitUntil(everyItem(displayed()));
+                .should(everyItem(displayed()));
     }
 }
