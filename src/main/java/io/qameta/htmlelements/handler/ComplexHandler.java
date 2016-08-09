@@ -1,5 +1,7 @@
 package io.qameta.htmlelements.handler;
 
+import io.qameta.htmlelements.exception.NotImplementedException;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -11,8 +13,7 @@ class ComplexHandler implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         return getMethodCallHandler(method)
-                .orElseThrow(() -> new UnsupportedOperationException(
-                        String.format("Method '%s' is not implemented", method.getName())))
+                .orElseThrow(() -> new NotImplementedException(method))
                 .invoke(proxy, method, args);
 
     }

@@ -17,7 +17,4 @@ public class Proxies {
         );
     }
 
-    public static <T> T targetProxy(Class<T> classToProxy, Object target) {
-        return simpleProxy(classToProxy, ((proxy, method, args) -> method.invoke(target, args)));
-    }
 }
