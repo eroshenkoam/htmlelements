@@ -5,7 +5,7 @@ import org.openqa.selenium.WebDriver;
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
-import static io.qameta.htmlelements.util.ReflectionUtils.getAllMethods;
+import static io.qameta.htmlelements.util.ReflectionUtils.getMethods;
 
 public class PageObjectHandler extends ComplexHandler {
 
@@ -28,7 +28,7 @@ public class PageObjectHandler extends ComplexHandler {
             return getSupplier().get();
         }
 
-        if (getAllMethods(proxyClass).contains(method)) {
+        if (getMethods(proxyClass, "toString").contains(method.getName())) {
             return invokeSupplierMethod(getSupplier(), method, args);
         }
 

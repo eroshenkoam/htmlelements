@@ -7,7 +7,7 @@ import org.openqa.selenium.support.pagefactory.ElementLocator;
 
 import java.lang.reflect.Method;
 
-import static io.qameta.htmlelements.util.ReflectionUtils.getAllMethods;
+import static io.qameta.htmlelements.util.ReflectionUtils.getMethods;
 
 class LocatingElementHandler extends ComplexHandler {
 
@@ -27,7 +27,7 @@ class LocatingElementHandler extends ComplexHandler {
 
         Class<?> proxyClass = WebElement.class;
 
-        if (getAllMethods(proxyClass).contains(method)) {
+        if (getMethods(proxyClass, "toString").contains(method.getName())) {
             return invokeProxyMethod(getLocator(), method, args);
         }
 

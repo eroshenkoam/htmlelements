@@ -7,10 +7,8 @@ import org.junit.Test;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
+import static org.hamcrest.CoreMatchers.not;
 import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.hasSize;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MatcherTest {
 
@@ -26,7 +24,10 @@ public class MatcherTest {
                 .waitUntil(displayed())
                 .should(displayed(), hasText("search-arrow"));
 
-        System.out.println(searchPage.searchArrow().suggest()
-                .should(everyItem(displayed())));
+        searchPage.searchArrow().suggest()
+                .filter(displayed())
+                .should(everyItem(displayed()));
     }
+
+
 }

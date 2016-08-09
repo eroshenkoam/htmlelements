@@ -16,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 
-import static io.qameta.htmlelements.util.ReflectionUtils.getAllMethods;
+import static io.qameta.htmlelements.util.ReflectionUtils.getMethods;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -31,7 +31,7 @@ public class SearchContextHandler<T> implements InvocationHandler {
         this.tartetClass = targetClass;
     }
 
-    public Class<T> getTartetClass() {
+    public Class<T> getTargetClass() {
         return tartetClass;
     }
 
@@ -42,9 +42,9 @@ public class SearchContextHandler<T> implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        Class<T> targetClass = getTartetClass();
+        Class<T> targetClass = getTargetClass();
 
-        if (getAllMethods(targetClass).contains(method)) {
+        if (getMethods(targetClass).contains(method)) {
             return invokeTargetMethod(getTargetProvider(), method, args);
         }
 

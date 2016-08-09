@@ -21,7 +21,6 @@ class ComplexHandler implements InvocationHandler {
     private Optional<MethodCallHandler> getMethodCallHandler(Method method) {
         List<MethodCallHandler> handlers = Arrays.asList(
                 new DefaultMethodCallHandler(),
-                new ToStringMethodCallHandler(),
                 new ShouldMatchedMethodCallHandler(),
                 new WaitUntilMatchedMethodCallHandler(),
                 new FilterMatchedMethodCallHandler(),

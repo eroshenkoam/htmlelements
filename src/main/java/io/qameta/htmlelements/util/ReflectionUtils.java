@@ -4,10 +4,12 @@ import io.qameta.htmlelements.annotation.Param;
 import org.apache.commons.lang3.ClassUtils;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
 
@@ -19,10 +21,13 @@ public class ReflectionUtils {
         return result;
     }
 
-    public static List<Method> getAllMethods(Class<?> clazz) {
-        return getAllInterfaces(clazz).stream()
-                .flatMap(m -> stream(m.getDeclaredMethods()))
-                .collect(Collectors.toList());
+    public static List<String> getMethods(Class<?> clazz, String... additional) {
+        return Stream.concat(
+                Arrays.stream(additional),
+                getAllInterfaces(clazz).stream()
+                        .flatMap(m -> stream(m.getDeclaredMethods()))
+                        .map(Method::getName)
+        ).collect(Collectors.toList());
     }
 
     public static Map<String, String> getParameters(Method method, Object[] args) {

@@ -16,6 +16,7 @@ class ShouldMatchedMethodCallHandler implements ByNameMethodCallHandler {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         Matcher[] matcherList = (Matcher[]) args[0];
         return ((SlowLoadableComponent<Object>) () -> {

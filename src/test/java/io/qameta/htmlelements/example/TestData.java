@@ -55,7 +55,7 @@ public class TestData {
 
         List<WebElement> suggest = Arrays.asList(
                 createWebElement("first suggest", true, true),
-                createWebElement("second suggest", true, true)
+                createWebElement("second suggest", false, true)
         );
 
         when(searchForm.findElement(By.xpath(REQUEST_INPUT_XPATH))).thenReturn(textInput);
@@ -71,6 +71,7 @@ public class TestData {
     private static WebElement createWebElement(String text, boolean displayed, boolean enabled) {
         WebElement webElement = mock(WebElement.class);
         when(webElement.getText()).thenReturn(text);
+        when(webElement.toString()).thenReturn(text);
         when(webElement.isDisplayed()).thenReturn(displayed);
         when(webElement.isEnabled()).thenReturn(enabled);
         return webElement;
