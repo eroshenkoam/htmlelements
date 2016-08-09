@@ -54,8 +54,8 @@ public class TestData {
         when(searchArrow.getText()).thenReturn("search-arro", "search", "search-arrow");
 
         List<WebElement> suggest = Arrays.asList(
-                createWebElement("first suggest", true, true),
-                createWebElement("second suggest", false, true)
+                createWebElement("first suggest", false, true),
+                createWebElement("second suggest", false, false, false, true)
         );
 
         when(searchForm.findElement(By.xpath(REQUEST_INPUT_XPATH))).thenReturn(textInput);
@@ -68,12 +68,11 @@ public class TestData {
         return driver;
     }
 
-    private static WebElement createWebElement(String text, boolean displayed, boolean enabled) {
+    private static WebElement createWebElement(String text, Boolean displayed, Boolean... displayedNext) {
         WebElement webElement = mock(WebElement.class);
         when(webElement.getText()).thenReturn(text);
         when(webElement.toString()).thenReturn(text);
-        when(webElement.isDisplayed()).thenReturn(displayed);
-        when(webElement.isEnabled()).thenReturn(enabled);
+        when(webElement.isDisplayed()).thenReturn(displayed, displayedNext);
         return webElement;
     }
 }

@@ -7,8 +7,7 @@ import org.junit.Test;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.Matchers.everyItem;
+import static org.hamcrest.Matchers.hasSize;
 
 public class MatcherTest {
 
@@ -26,7 +25,7 @@ public class MatcherTest {
 
         searchPage.searchArrow().suggest()
                 .filter(displayed())
-                .should(everyItem(displayed()));
+                .should(hasSize(2));
     }
 
 

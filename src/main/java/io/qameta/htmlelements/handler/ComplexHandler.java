@@ -23,7 +23,6 @@ class ComplexHandler implements InvocationHandler {
                 new DefaultMethodCallHandler(),
                 new ShouldMatchedMethodCallHandler(),
                 new WaitUntilMatchedMethodCallHandler(),
-                new FilterMatchedMethodCallHandler(),
                 new HtmlElementMethodCallHandler(),
                 new HtmlElementListMethodCallHandler()
         );
