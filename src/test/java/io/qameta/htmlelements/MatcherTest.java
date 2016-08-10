@@ -23,9 +23,10 @@ public class MatcherTest {
                 .waitUntil(displayed())
                 .should(displayed(), hasText("search-arrow"));
 
-        searchPage.searchArrow().suggest()
-                .filter(displayed())
-                .should(hasSize(2));
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
     }
 
 

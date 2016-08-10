@@ -19,12 +19,19 @@ class LocatingElementListHandler extends ComplexHandler {
 
     private final WebElementContext context;
 
+    private final Matcher[] matchers;
+
     LocatingElementListHandler(WebElementContext context, Matcher... matchers) {
+        this.matchers = matchers;
         this.context = context;
     }
 
     private WebElementContext getContext() {
         return context;
+    }
+
+    public Matcher[] getMatchers() {
+        return matchers;
     }
 
     @Override
@@ -56,7 +63,7 @@ class LocatingElementListHandler extends ComplexHandler {
     }
 
     private Object invokeProxyMethod(ElementLocator locator, Method method, Object[] args) throws Throwable {
-        List elements = findWebElements(locator, getContext().getWebElementClass());
+        List elements = findWebElements(locator, getContext().getWebElementClass(), getMatchers());
         try {
             return method.invoke(elements, args);
         } catch (InvocationTargetException e) {
