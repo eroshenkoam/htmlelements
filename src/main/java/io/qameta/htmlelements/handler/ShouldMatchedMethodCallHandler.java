@@ -8,11 +8,11 @@ import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-class ShouldMatchedMethodCallHandler implements ByNameMethodCallHandler {
+class ShouldMatchedMethodCallHandler implements MethodCallHandler {
 
     @Override
-    public String getHandleMethodName() {
-        return "should";
+    public boolean canHandle(Method method) {
+        return "should".equals(method.getName());
     }
 
     @Override

@@ -1,10 +1,11 @@
 package io.qameta.htmlelements.handler;
 
-import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 
-public interface MethodCallHandler extends InvocationHandler {
+public interface MethodCallHandler {
 
-    boolean canHandle (Method method);
+    boolean canHandle(Method method);
+
+    Object invoke(Object proxy, Method method, Object[] args) throws Throwable;
 
 }

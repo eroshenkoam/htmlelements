@@ -7,11 +7,11 @@ import org.openqa.selenium.NoSuchElementException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
 
-class WaitUntilMatchedMethodCallHandler implements ByNameMethodCallHandler {
+class WaitUntilMatchedMethodCallHandler implements MethodCallHandler {
 
     @Override
-    public String getHandleMethodName() {
-        return "waitUntil";
+    public boolean canHandle(Method method) {
+        return "waitUntil".equals(method.getName());
     }
 
     @Override
