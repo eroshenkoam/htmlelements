@@ -7,6 +7,8 @@ import org.junit.Test;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.everyItem;
 import static org.hamcrest.Matchers.hasSize;
 
 public class MatcherTest {
@@ -21,12 +23,13 @@ public class MatcherTest {
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
         searchPage.searchArrow()
                 .waitUntil(displayed())
-                .should(displayed(), hasText("search-arrow"));
+                .should(both(displayed()).and(hasText("search-arrow")));
 
-        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
-        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
-        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
-        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+        System.out.println(searchPage.searchArrow().suggest().getName());
+
+        searchPage.searchArrow().suggest()
+                .should(everyItem(displayed()));
+
     }
 
 

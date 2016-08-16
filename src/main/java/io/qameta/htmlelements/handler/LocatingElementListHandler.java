@@ -39,7 +39,7 @@ class LocatingElementListHandler extends ComplexHandler {
 
         Class<?> proxyClass = List.class;
 
-        if (getMethods(proxyClass, "toString").contains(method.getName())) {
+        if (getMethods(proxyClass).contains(method.getName())) {
             return invokeProxyMethod(getContext().getLocator(), method, args);
         }
 

@@ -23,12 +23,12 @@ public class DisplayedMatcher extends TypeSafeMatcher<WebElement> {
 
     @Override
     public void describeTo(Description description) {
-        description.appendText("element is displayed on page");
+        description.appendText("element is displayed");
     }
 
     @Override
     public void describeMismatchSafely(WebElement element, Description mismatchDescription) {
-        mismatchDescription.appendText("element ").appendValue(element).appendText(" is not displayed on page");
+        mismatchDescription.appendText("element ").appendValue(element).appendText(" is not displayed");
     }
 
     /**

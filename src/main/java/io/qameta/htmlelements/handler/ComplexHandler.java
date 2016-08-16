@@ -22,9 +22,7 @@ class ComplexHandler implements InvocationHandler {
         List<MethodCallHandler> handlers = Arrays.asList(
                 new DefaultMethodCallHandler(),
                 new ShouldMatchedMethodCallHandler(),
-                new WaitUntilMatchedMethodCallHandler(),
-                new HtmlElementMethodCallHandler(),
-                new HtmlElementListMethodCallHandler()
+                new WaitUntilMatchedMethodCallHandler()
         );
 
         return handlers.stream().filter(handler -> handler.canHandle(method)).findFirst();

@@ -4,6 +4,6 @@ import org.hamcrest.Matcher;
 
 interface ShouldMatched<T> {
 
-    T should(Matcher... matcher);
+    T should(Matcher matcher);
 
 }
