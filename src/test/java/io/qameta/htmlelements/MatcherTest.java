@@ -5,11 +5,11 @@ import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 
+import java.util.function.Supplier;
+
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.everyItem;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 
 public class MatcherTest {
 
@@ -23,12 +23,10 @@ public class MatcherTest {
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
         searchPage.searchArrow()
                 .waitUntil(displayed())
-                .should(both(displayed()).and(hasText("search-arrow")));
+                .should(hasText("search-arrow"));
 
-        System.out.println(searchPage.searchArrow().suggest().getName());
-
-        searchPage.searchArrow().suggest()
-                .should(everyItem(displayed()));
+        System.out.println(searchPage.searchArrow().form("form").getSelector());
+        System.out.println(searchPage.searchArrow().suggest().stream().findFirst().get().getAbsoluteSelector());
 
     }
 

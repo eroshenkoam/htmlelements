@@ -11,6 +11,7 @@ import io.qameta.htmlelements.example.TestData;
  */
 public interface SearchArrow extends WithSuggest, HtmlElement {
 
+    @Name("")
     @FindBy(TestData.SEARCH_FORM_TEMPLATE)
     SearchForm form(@Param("className") String className);
 

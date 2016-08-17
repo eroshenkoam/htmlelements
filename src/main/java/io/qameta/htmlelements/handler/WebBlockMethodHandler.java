@@ -1,7 +1,7 @@
 package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.annotation.FindBy;
-import io.qameta.htmlelements.context.WebBlockContext;
+import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.NotImplementedException;
 import io.qameta.htmlelements.proxy.Proxies;
 import io.qameta.htmlelements.water.SlowLoadableComponent;
@@ -27,11 +27,11 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
 
     private final Supplier<T> targetProvider;
 
-    private final WebBlockContext context;
+    private final Context context;
 
     private final Class<T> targetClass;
 
-    public WebBlockMethodHandler(Class<T> targetClass, WebBlockContext context, Supplier<T> targetProvider) {
+    public WebBlockMethodHandler(Class<T> targetClass, Context context, Supplier<T> targetProvider) {
         this.targetProvider = targetProvider;
         this.targetClass = targetClass;
         this.context = context;
@@ -45,7 +45,7 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
         return this.targetProvider;
     }
 
-    public WebBlockContext getContext() {
+    public Context getContext() {
         return context;
     }
 
@@ -60,8 +60,16 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
         Class<T> targetClass = getTargetClass();
 
         // web element proxy
-        if (getMethods(targetClass, "toString").contains(method.getName())) {
+        if (getMethods(targetClass).contains(method.getName())) {
             return invokeTargetMethod(getTargetProvider(), method, args);
+        }
+
+        // context
+        if ("toString".equals(method.getName())) {
+            return String.format("{name: %s, selector: %s}",
+                    getContext().getName(),
+                    getContext().getSelector()
+            );
         }
 
         // context
@@ -69,14 +77,17 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
             return getContext().getName();
         }
 
+        if ("getSelector".equals(method.getName())) {
+            return getContext().getSelector();
+        }
+
+        if ("getAbsoluteSelector".equals(method.getName())) {
+            return getContext().getAbsoluteSelector();
+        }
+
         // context
         if ("getWrappedDriver".equals(method.getName())) {
             return getContext().getDriver();
-        }
-
-        // extensions
-        if ("should".equals(method.getName())) {
-            return invokeShouldMethod(proxy, method, args);
         }
 
         // finder extension
@@ -84,15 +95,22 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
             return invokeWaitUntilMethod(proxy, method, args);
         }
 
+        // extensions
+        if ("should".equals(method.getName())) {
+            return invokeShouldMethod(proxy, method, args);
+        }
+
         Class<?> proxyClass = method.getReturnType();
         String name = method.getName();
         String selector = method.getAnnotation(FindBy.class).value();
-        WebBlockContext childContext = getContext().child(name, selector);
+
+        Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
 
         // html element proxy (recurse)
         if (method.isAnnotationPresent(FindBy.class) && WebElement.class.isAssignableFrom(proxyClass)) {
-            return createProxy(method.getReturnType(), WebElement.class, childContext, () ->
-                    ((SearchContext) proxy).findElement(By.xpath(selector)));
+            return createProxy(method.getReturnType(), WebElement.class, childContext, () -> {
+                return ((SearchContext) proxy).findElement(By.xpath(selector));
+            });
         }
 
         // html element list proxy (recurse)
@@ -147,10 +165,9 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
     }
 
     private <R> Object createProxy(Class<?> proxyClass, Class<R> targetClass,
-                                   WebBlockContext context, Supplier<R> supplier) {
+                                   Context context, Supplier<R> supplier) {
         return Proxies.simpleProxy(
-                proxyClass,
-                new WebBlockMethodHandler<>(targetClass, context, supplier)
+                proxyClass, new WebBlockMethodHandler<>(targetClass, context, supplier)
         );
     }
 

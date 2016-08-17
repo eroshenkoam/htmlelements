@@ -4,4 +4,6 @@ public interface HasName {
 
     String getName();
 
+    String getAbsoluteName();
+
 }

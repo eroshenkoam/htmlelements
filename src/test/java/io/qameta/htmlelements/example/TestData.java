@@ -50,7 +50,7 @@ public class TestData {
         });
 
         WebElement searchArrow = mock(WebElement.class);
-        when(searchArrow.isDisplayed()).thenReturn(false, false, false, false, true);
+        when(searchArrow.isDisplayed()).thenReturn(true);
         when(searchArrow.getText()).thenReturn("search-arro", "search", "search-arrow");
 
         List<WebElement> suggest = Arrays.asList(
