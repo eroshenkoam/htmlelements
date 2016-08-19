@@ -4,7 +4,7 @@ import org.openqa.selenium.WebElement;
 
 import java.util.List;
 
-public interface HtmlElementList<T extends WebElement> extends List<T>, HasName,
+public interface HtmlElementList<T extends WebElement> extends List<T>, WebBlock,
         ShouldMatched<HtmlElementList<T>>,
         WaitUntilMatched<HtmlElementList<T>>,
         FilterMatched<HtmlElementList<T>> {

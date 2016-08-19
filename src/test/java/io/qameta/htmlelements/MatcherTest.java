@@ -26,7 +26,7 @@ public class MatcherTest {
                 .should(hasText("search-arrow"));
 
         System.out.println(searchPage.searchArrow().form("form").getSelector());
-        System.out.println(searchPage.searchArrow().suggest().stream().findFirst().get().getAbsoluteSelector());
+        System.out.println(searchPage.searchArrow().suggest().getSelector());
 
     }
 

@@ -31,7 +31,7 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
 
     private final Class<T> targetClass;
 
-    public WebBlockMethodHandler(Class<T> targetClass, Context context, Supplier<T> targetProvider) {
+    public WebBlockMethodHandler(Context context, Class<T> targetClass, Supplier<T> targetProvider) {
         this.targetProvider = targetProvider;
         this.targetClass = targetClass;
         this.context = context;
@@ -57,6 +57,11 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
             return invokeDefaultMethod(proxy, method, args);
         }
 
+        //context
+        if (Context.class.equals(method.getReturnType())) {
+            return getContext();
+        }
+
         Class<T> targetClass = getTargetClass();
 
         // web element proxy
@@ -64,40 +69,26 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
             return invokeTargetMethod(getTargetProvider(), method, args);
         }
 
-        // context
+        // extension
+        if ("waitUntil".equals(method.getName())) {
+            return invokeWaitUntilMethod(proxy, method, args);
+        }
+
+        // extension
+        if ("filter".equals(method.getName())) {
+            return invokeWaitUntilMethod(proxy, method, args);
+        }
+
+        // extension
+        if ("should".equals(method.getName())) {
+            return invokeShouldMethod(proxy, method, args);
+        }
+
         if ("toString".equals(method.getName())) {
             return String.format("{name: %s, selector: %s}",
                     getContext().getName(),
                     getContext().getSelector()
             );
-        }
-
-        // context
-        if ("getName".equals(method.getName())) {
-            return getContext().getName();
-        }
-
-        if ("getSelector".equals(method.getName())) {
-            return getContext().getSelector();
-        }
-
-        if ("getAbsoluteSelector".equals(method.getName())) {
-            return getContext().getAbsoluteSelector();
-        }
-
-        // context
-        if ("getWrappedDriver".equals(method.getName())) {
-            return getContext().getDriver();
-        }
-
-        // finder extension
-        if ("waitUntil".equals(method.getName())) {
-            return invokeWaitUntilMethod(proxy, method, args);
-        }
-
-        // extensions
-        if ("should".equals(method.getName())) {
-            return invokeShouldMethod(proxy, method, args);
         }
 
         Class<?> proxyClass = method.getReturnType();
@@ -167,7 +158,7 @@ public class WebBlockMethodHandler<T> extends ComplexHandler {
     private <R> Object createProxy(Class<?> proxyClass, Class<R> targetClass,
                                    Context context, Supplier<R> supplier) {
         return Proxies.simpleProxy(
-                proxyClass, new WebBlockMethodHandler<>(targetClass, context, supplier)
+                proxyClass, new WebBlockMethodHandler<>(context, targetClass, supplier)
         );
     }
 
