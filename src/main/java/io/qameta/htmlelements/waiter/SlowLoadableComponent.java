@@ -1,4 +1,4 @@
-package io.qameta.htmlelements.water;
+package io.qameta.htmlelements.waiter;
 
 import org.openqa.selenium.support.ui.Clock;
 import org.openqa.selenium.support.ui.SystemClock;

@@ -5,7 +5,7 @@ import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.NotImplementedException;
 import io.qameta.htmlelements.proxy.Proxies;
 import io.qameta.htmlelements.util.ReflectionUtils;
-import io.qameta.htmlelements.water.SlowLoadableComponent;
+import io.qameta.htmlelements.waiter.SlowLoadableComponent;
 import org.hamcrest.Matcher;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
