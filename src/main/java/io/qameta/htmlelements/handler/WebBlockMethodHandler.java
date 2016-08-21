@@ -21,14 +21,20 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.qameta.htmlelements.util.ReflectionUtils.getMethods;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class WebBlockMethodHandler<T> implements InvocationHandler {
+
+    private static final String FILTER_KEY = "filter";
+
+    private static final String CONVERTER_KEY = "convert";
 
     private final Supplier<T> targetProvider;
 
@@ -82,6 +88,10 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         // extension
         if ("filter".equals(method.getName())) {
             return invokeFilterMethod(proxy, method, args);
+        }
+
+        if ("convert".equals(method.getName())) {
+            return invokeConvertMethod(proxy, method, args);
         }
 
         // extension
@@ -142,13 +152,22 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
             throws Throwable {
         return ((SlowLoadableComponent<Object>) () -> {
             if (List.class.isAssignableFrom(getTargetClass())) {
-                Object target = targetProvider.get();
-                if (getContext().getStore().containsKey("filter")) {
-                    List<Matcher> matchers = (List<Matcher>) getContext().getStore().get("filter");
-                    target = ((List) target).stream()
-                            .filter(element -> matchers.stream().allMatch(matcher -> matcher.matches(element)))
-                            .collect(Collectors.toList());
+
+                Stream targetStream = ((List) targetProvider.get()).stream();
+
+                List<Matcher> filters = getContext().getStore().containsKey(FILTER_KEY) ?
+                        (List<Matcher>) getContext().getStore().get(FILTER_KEY) : new ArrayList<>();
+                for (Matcher filter: filters) {
+                    targetStream = targetStream.filter(filter::matches);
                 }
+
+                List<Function> converters = getContext().getStore().containsKey(CONVERTER_KEY) ?
+                        (List<Function>) getContext().getStore().get(CONVERTER_KEY) : new ArrayList<>();
+                for (Function converter: converters) {
+                    targetStream = targetStream.map(converter);
+                }
+
+                Object target = targetStream.collect(Collectors.toList());
                 return method.invoke(target, args);
             } else {
                 Object target = targetProvider.get();
@@ -180,10 +199,20 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     @SuppressWarnings({"unchecked", "unused"})
     private Object invokeFilterMethod(Object proxy, Method method, Object[] args) throws Throwable {
         Map<String, Object> store = getContext().getStore();
-        List<Matcher> matchers = store.containsKey("filter") ?
-                (List<Matcher>) store.get("filter") : new ArrayList<>();
+        List<Matcher> matchers = store.containsKey(FILTER_KEY) ?
+                (List<Matcher>) store.get(FILTER_KEY) : new ArrayList<>();
         matchers.add((Matcher) args[0]);
-        store.put("filter", matchers);
+        store.put(FILTER_KEY, matchers);
+        return proxy;
+    }
+
+    @SuppressWarnings({"unchecked", "unused"})
+    private Object invokeConvertMethod(Object proxy, Method method, Object[] args) throws Throwable {
+        Map<String, Object> store = getContext().getStore();
+        List<Function> matchers = store.containsKey(CONVERTER_KEY) ?
+                (List<Function>) store.get(CONVERTER_KEY) : new ArrayList<>();
+        matchers.add((Function) args[0]);
+        store.put(CONVERTER_KEY, matchers);
         return proxy;
     }
 

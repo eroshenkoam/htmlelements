@@ -4,6 +4,7 @@ import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
+import org.openqa.selenium.WebElement;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
@@ -23,7 +24,14 @@ public class MatcherTest {
                 .waitUntil(displayed())
                 .should(hasText("search-arrow"));
 
-        System.out.println(searchPage.searchArrow().form("form").getName());
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+        System.out.println(searchPage.searchArrow().suggest().filter(displayed()).size());
+
+        searchPage.searchArrow().suggest()
+                .convert(WebElement::getText)
+                .forEach(System.out::println);
 
         searchPage.searchArrow().suggest()
                 .filter(displayed())
