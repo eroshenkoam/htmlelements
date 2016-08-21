@@ -1,7 +1,11 @@
 package io.qameta.htmlelements.util;
 
+import com.google.common.base.Joiner;
+import io.qameta.htmlelements.annotation.FindBy;
+import io.qameta.htmlelements.annotation.Name;
 import io.qameta.htmlelements.annotation.Param;
 import org.apache.commons.lang3.ClassUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -15,7 +19,7 @@ import static java.util.Arrays.stream;
 
 public class ReflectionUtils {
 
-    public static List<Class<?>> getAllInterfaces(Class<?> clazz) {
+    private static List<Class<?>> getAllInterfaces(Class<?> clazz) {
         List<Class<?>> result = ClassUtils.getAllInterfaces(clazz);
         result.add(clazz);
         return result;
@@ -40,6 +44,36 @@ public class ReflectionUtils {
             parameters.put(method.getParameters()[i].getAnnotation(Param.class).value(), args[i].toString());
         }
         return parameters;
+    }
+
+    public static String getName(Class<?> clazz) {
+        return splitCamelCase(clazz.getSimpleName());
+    }
+
+    public static String getSelector(Method method, Object[] args) {
+        Map<String, String> parameters = getParameters(method, args);
+        String selector = method.getAnnotation(FindBy.class).value();
+        for (String key : parameters.keySet()) {
+            selector = selector.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+        }
+        return selector;
+    }
+
+    public static String getName(Method method, Object[] args) {
+        if (method.isAnnotationPresent(Name.class)) {
+            Map<String, String> parameters = getParameters(method, args);
+            String name = method.getAnnotation(Name.class).value();
+            for (String key : parameters.keySet()) {
+                name = name.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+            }
+            return name;
+        } else {
+            return splitCamelCase(method.getName());
+        }
+    }
+
+    private static String splitCamelCase(String text) {
+        return Joiner.on(" ").join(StringUtils.splitByCharacterTypeCamelCase(text));
     }
 
 }

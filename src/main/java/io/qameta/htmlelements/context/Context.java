@@ -1,16 +1,12 @@
 package io.qameta.htmlelements.context;
 
-import com.google.common.base.Joiner;
-import org.apache.commons.lang3.StringUtils;
-import org.hamcrest.Matcher;
+import io.qameta.htmlelements.util.ReflectionUtils;
 import org.openqa.selenium.WebDriver;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Context {
-
-    private Context parent;
 
     private String name;
 
@@ -18,12 +14,12 @@ public class Context {
 
     private WebDriver driver;
 
-    private Class<?> proxyClass;
+    private Context parent;
 
-    private List<Matcher> conditions;
+    private Map<String, Object> store;
 
     private Context() {
-        this.conditions = new ArrayList<>();
+        this.store = new HashMap<>();
     }
 
     public String getName() {
@@ -62,26 +58,13 @@ public class Context {
         this.parent = parent;
     }
 
-    public Class<?> getProxyClass() {
-        return proxyClass;
-    }
-
-    private void setProxyClass(Class<?> proxyClass) {
-        this.proxyClass = proxyClass;
-    }
-
-    public List<Matcher> getConditions() {
-        return conditions;
-    }
-
-    public void addCondition(Matcher condition) {
-        getConditions().add(condition);
+    public Map<String, Object> getStore() {
+        return store;
     }
 
     public Context newChildContext(String name, String selector, Class<?> proxyClass) {
         Context childContext = new Context();
         childContext.setDriver(this.getDriver());
-        childContext.setProxyClass(proxyClass);
         childContext.setSelector(selector);
         childContext.setParent(this);
         childContext.setName(name);
@@ -90,14 +73,9 @@ public class Context {
 
     public static Context newWebPageContext(Class<?> webPageClass, WebDriver driver) {
         Context context = new Context();
-        context.setName(splitCamelCase(webPageClass.getSimpleName()));
-        context.setProxyClass(webPageClass);
+        context.setName(ReflectionUtils.getName(webPageClass));
         context.setDriver(driver);
         return context;
-    }
-
-    private static String splitCamelCase(String text) {
-        return Joiner.on(" ").join(StringUtils.splitByCharacterTypeCamelCase(text));
     }
 
 

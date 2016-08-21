@@ -4,6 +4,6 @@ import org.hamcrest.Matcher;
 
 public interface FilterMatched<T> {
 
-    T filter(Matcher... matcher);
+    T filter(Matcher matcher);
 
 }

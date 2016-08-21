@@ -5,8 +5,6 @@ import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 
-import java.util.function.Supplier;
-
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
 import static org.hamcrest.Matchers.*;
@@ -25,9 +23,14 @@ public class MatcherTest {
                 .waitUntil(displayed())
                 .should(hasText("search-arrow"));
 
-        System.out.println(searchPage.searchArrow().form("form").getSelector());
-        System.out.println(searchPage.searchArrow().suggest().getSelector());
+        System.out.println(searchPage.searchArrow().form("form").getName());
 
+        searchPage.searchArrow().suggest()
+                .filter(displayed())
+                .should(hasSize(2));
+
+        searchPage.searchArrow().suggest()
+                .should(everyItem(notNullValue()));
     }
 
 
