@@ -2,7 +2,11 @@ package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.Context;
+import io.qameta.htmlelements.element.HtmlElement;
 import io.qameta.htmlelements.exception.NotImplementedException;
+import io.qameta.htmlelements.extension.ContextEnricher;
+import io.qameta.htmlelements.extension.ContextMethodInterceptor;
+import io.qameta.htmlelements.extension.ExtensionRegistry;
 import io.qameta.htmlelements.proxy.Proxies;
 import io.qameta.htmlelements.util.ReflectionUtils;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
@@ -26,7 +30,7 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.qameta.htmlelements.util.ReflectionUtils.getMethods;
+import static io.qameta.htmlelements.util.ReflectionUtils.getMethodsNames;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -76,7 +80,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         Class<T> targetClass = getTargetClass();
 
         // web element proxy
-        if (getMethods(targetClass).contains(method.getName())) {
+        if (getMethodsNames(targetClass).contains(method.getName())) {
             return invokeTargetMethod(getTargetProvider(), method, args);
         }
 
@@ -113,6 +117,8 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         String selector = ReflectionUtils.getSelector(method, args);
 
         Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
+        context.getRegistry().getExtensions(ContextEnricher.class)
+                .forEach(enricher -> enricher.enrich(context, method, args));
 
         // html element proxy (recurse)
         if (method.isAnnotationPresent(FindBy.class) && WebElement.class.isAssignableFrom(proxyClass)) {
@@ -157,13 +163,13 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
 
                 List<Matcher> filters = getContext().getStore().containsKey(FILTER_KEY) ?
                         (List<Matcher>) getContext().getStore().get(FILTER_KEY) : new ArrayList<>();
-                for (Matcher filter: filters) {
+                for (Matcher filter : filters) {
                     targetStream = targetStream.filter(filter::matches);
                 }
 
                 List<Function> converters = getContext().getStore().containsKey(CONVERTER_KEY) ?
                         (List<Function>) getContext().getStore().get(CONVERTER_KEY) : new ArrayList<>();
-                for (Function converter: converters) {
+                for (Function converter : converters) {
                     targetStream = targetStream.map(converter);
                 }
 
