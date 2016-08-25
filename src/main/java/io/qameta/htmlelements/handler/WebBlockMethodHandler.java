@@ -75,10 +75,10 @@ public class WebBlockMethodHandler implements InvocationHandler {
             return getContext();
         }
 
-        Class<?>[] targetClass = getTargetClasses();
+        Class<?>[] targetClasses = getTargetClasses();
 
         // web element proxy
-        if (getMethods(targetClass).contains(method.getName())) {
+        if (getMethods(targetClasses).contains(method.getName())) {
             return invokeTargetMethod(getTargetProvider(), method, args);
         }
 
@@ -136,7 +136,8 @@ public class WebBlockMethodHandler implements InvocationHandler {
                 Type methodReturnType = ((ParameterizedType) method
                         .getGenericReturnType()).getActualTypeArguments()[0];
                 return (List) originalElements.stream()
-                        .map(element -> createProxy((Class<?>) methodReturnType, childContext, () -> element, WebElement.class))
+                        .map(element -> createProxy((Class<?>) methodReturnType, childContext,
+                                () -> element, WebElement.class, Locatable.class))
                         .collect(toList());
             }, List.class);
         }
