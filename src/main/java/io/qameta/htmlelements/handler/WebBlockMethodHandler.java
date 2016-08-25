@@ -2,11 +2,8 @@ package io.qameta.htmlelements.handler;
 
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.Context;
-import io.qameta.htmlelements.element.HtmlElement;
 import io.qameta.htmlelements.exception.NotImplementedException;
 import io.qameta.htmlelements.extension.ContextEnricher;
-import io.qameta.htmlelements.extension.ContextMethodInterceptor;
-import io.qameta.htmlelements.extension.ExtensionRegistry;
 import io.qameta.htmlelements.proxy.Proxies;
 import io.qameta.htmlelements.util.ReflectionUtils;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
@@ -26,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -161,10 +159,10 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
 
                 Stream targetStream = ((List) targetProvider.get()).stream();
 
-                List<Matcher> filters = getContext().getStore().containsKey(FILTER_KEY) ?
-                        (List<Matcher>) getContext().getStore().get(FILTER_KEY) : new ArrayList<>();
-                for (Matcher filter : filters) {
-                    targetStream = targetStream.filter(filter::matches);
+                List<Predicate> filters = getContext().getStore().containsKey(FILTER_KEY) ?
+                        (List<Predicate>) getContext().getStore().get(FILTER_KEY) : new ArrayList<>();
+                for (Predicate filter : filters) {
+                    targetStream = targetStream.filter(filter);
                 }
 
                 List<Function> converters = getContext().getStore().containsKey(CONVERTER_KEY) ?
@@ -193,9 +191,9 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
 
     @SuppressWarnings({"unchecked", "unused"})
     private Object invokeWaitUntilMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        Matcher matcher = (Matcher) args[0];
+        Predicate predicate = (Predicate) args[0];
         return ((SlowLoadableComponent<Object>) () -> {
-            if (matcher.matches(proxy)) {
+            if (predicate.test(proxy)) {
                 return proxy;
             }
             throw new NoSuchElementException("No such element exception");
@@ -205,10 +203,10 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     @SuppressWarnings({"unchecked", "unused"})
     private Object invokeFilterMethod(Object proxy, Method method, Object[] args) throws Throwable {
         Map<String, Object> store = getContext().getStore();
-        List<Matcher> matchers = store.containsKey(FILTER_KEY) ?
-                (List<Matcher>) store.get(FILTER_KEY) : new ArrayList<>();
-        matchers.add((Matcher) args[0]);
-        store.put(FILTER_KEY, matchers);
+        List<Predicate> predicates = store.containsKey(FILTER_KEY) ?
+                (List<Predicate>) store.get(FILTER_KEY) : new ArrayList<>();
+        predicates.add((Predicate) args[0]);
+        store.put(FILTER_KEY, predicates);
         return proxy;
     }
 
