@@ -9,6 +9,7 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,19 +21,21 @@ import static java.util.Arrays.stream;
 
 public class ReflectionUtils {
 
-    private static List<Class<?>> getAllInterfaces(Class<?> clazz) {
-        List<Class<?>> result = ClassUtils.getAllInterfaces(clazz);
-        result.add(clazz);
+    private static List<Class<?>> getAllInterfaces(Class<?>[] classes) {
+        List<Class<?>> result = new ArrayList<>();
+
+        Arrays.stream(classes).forEach(clazz -> {
+            result.addAll(ClassUtils.getAllInterfaces(clazz));
+            result.add(clazz);
+        });
         return result;
     }
 
-    public static List<String> getMethods(Class<?> clazz, String... additional) {
-        return Stream.concat(
-                Arrays.stream(additional),
-                getAllInterfaces(clazz).stream()
-                        .flatMap(m -> stream(m.getDeclaredMethods()))
-                        .map(Method::getName)
-        ).collect(Collectors.toList());
+    public static List<String> getMethods(Class<?>[] classes) {
+        return getAllInterfaces(classes).stream()
+                .flatMap(m -> stream(m.getDeclaredMethods()))
+                .map(Method::getName)
+                .collect(Collectors.toList());
     }
 
     public static Map<String, String> getParameters(Method method, Object[] args) {
