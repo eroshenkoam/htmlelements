@@ -10,7 +10,7 @@ public interface HtmlElement extends WebBlock, WebElement, Locatable,
 
     default HtmlElement hover() {
         Actions actions = new Actions(getContext().getDriver());
-        actions.moveToElement(this);
+        actions.moveToElement(this).perform();
         return this;
     }
 
