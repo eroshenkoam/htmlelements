@@ -111,13 +111,12 @@ public class WebBlockMethodHandler implements InvocationHandler {
 
         Class<?> proxyClass = method.getReturnType();
 
-        String name = ReflectionUtils.getName(method, args);
-        String selector = ReflectionUtils.getSelector(method, args);
-
-        Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
-
         // html element proxy (recurse)
         if (method.isAnnotationPresent(FindBy.class) && WebElement.class.isAssignableFrom(proxyClass)) {
+            String name = ReflectionUtils.getName(method, args);
+            String selector = ReflectionUtils.getSelector(method, args);
+            Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
+
             return createProxy(
                     method.getReturnType(),
                     childContext,
@@ -128,6 +127,10 @@ public class WebBlockMethodHandler implements InvocationHandler {
 
         // html element list proxy (recurse)
         if (method.isAnnotationPresent(FindBy.class) && List.class.isAssignableFrom(method.getReturnType())) {
+            String name = ReflectionUtils.getName(method, args);
+            String selector = ReflectionUtils.getSelector(method, args);
+            Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
+
             return createProxy(method.getReturnType(), childContext, () -> {
                 List<WebElement> originalElements = ((SearchContext) proxy).findElements(By.xpath(selector));
                 Type methodReturnType = ((ParameterizedType) method
