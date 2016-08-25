@@ -190,7 +190,6 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     private Object invokeWaitUntilMethod(Object proxy, Method method, Object[] args) throws Throwable {
         Predicate predicate = (Predicate) args[0];
         return ((SlowLoadableComponent<Object>) () -> {
-            System.out.println(((List) proxy).size());
             if (predicate.test(proxy)) {
                 return proxy;
             }
