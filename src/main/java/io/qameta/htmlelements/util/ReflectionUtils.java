@@ -1,6 +1,7 @@
 package io.qameta.htmlelements.util;
 
 import com.google.common.base.Joiner;
+import io.qameta.htmlelements.annotation.Description;
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.annotation.Name;
 import io.qameta.htmlelements.annotation.Param;
@@ -60,9 +61,9 @@ public class ReflectionUtils {
     }
 
     public static String getName(Method method, Object[] args) {
-        if (method.isAnnotationPresent(Name.class)) {
+        if (method.isAnnotationPresent(Description.class)) {
             Map<String, String> parameters = getParameters(method, args);
-            String name = method.getAnnotation(Name.class).value();
+            String name = method.getAnnotation(Description.class).value();
             for (String key : parameters.keySet()) {
                 name = name.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
             }

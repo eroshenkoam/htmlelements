@@ -2,8 +2,18 @@ package io.qameta.htmlelements.element;
 
 import org.hamcrest.Matcher;
 
-public interface FilterMatched<T> {
+import java.util.function.Predicate;
 
-    T filter(Matcher matcher);
+public interface FilterMatched<ReturnType, PredicateType> {
+
+    ReturnType filter(Predicate<PredicateType> predicate);
+
+    default ReturnType filter(String description, Predicate<PredicateType> predicate) {
+        return filter(predicate);
+    }
+
+    default ReturnType filter(Matcher matcher) {
+        return filter(matcher::matches);
+    }
 
 }

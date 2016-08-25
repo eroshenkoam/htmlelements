@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -155,15 +156,15 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
 
                 Stream targetStream = ((List) targetProvider.get()).stream();
 
-                List<Matcher> filters = getContext().getStore().containsKey(FILTER_KEY) ?
-                        (List<Matcher>) getContext().getStore().get(FILTER_KEY) : new ArrayList<>();
-                for (Matcher filter: filters) {
-                    targetStream = targetStream.filter(filter::matches);
+                List<Predicate> filters = getContext().getStore().containsKey(FILTER_KEY) ?
+                        (List<Predicate>) getContext().getStore().get(FILTER_KEY) : new ArrayList<>();
+                for (Predicate filter : filters) {
+                    targetStream = targetStream.filter(filter);
                 }
 
                 List<Function> converters = getContext().getStore().containsKey(CONVERTER_KEY) ?
                         (List<Function>) getContext().getStore().get(CONVERTER_KEY) : new ArrayList<>();
-                for (Function converter: converters) {
+                for (Function converter : converters) {
                     targetStream = targetStream.map(converter);
                 }
 
@@ -187,9 +188,10 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
 
     @SuppressWarnings({"unchecked", "unused"})
     private Object invokeWaitUntilMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        Matcher matcher = (Matcher) args[0];
+        Predicate predicate = (Predicate) args[0];
         return ((SlowLoadableComponent<Object>) () -> {
-            if (matcher.matches(proxy)) {
+            System.out.println(((List) proxy).size());
+            if (predicate.test(proxy)) {
                 return proxy;
             }
             throw new NoSuchElementException("No such element exception");
@@ -199,10 +201,10 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     @SuppressWarnings({"unchecked", "unused"})
     private Object invokeFilterMethod(Object proxy, Method method, Object[] args) throws Throwable {
         Map<String, Object> store = getContext().getStore();
-        List<Matcher> matchers = store.containsKey(FILTER_KEY) ?
-                (List<Matcher>) store.get(FILTER_KEY) : new ArrayList<>();
-        matchers.add((Matcher) args[0]);
-        store.put(FILTER_KEY, matchers);
+        List<Predicate> predicates = store.containsKey(FILTER_KEY) ?
+                (List<Predicate>) store.get(FILTER_KEY) : new ArrayList<>();
+        predicates.add((Predicate) args[0]);
+        store.put(FILTER_KEY, predicates);
         return proxy;
     }
 
