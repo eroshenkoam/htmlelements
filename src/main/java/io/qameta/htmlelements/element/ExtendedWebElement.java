@@ -1,7 +1,7 @@
 package io.qameta.htmlelements.element;
 
-import io.qameta.htmlelements.extension.Description;
-import io.qameta.htmlelements.extension.Selector;
+import io.qameta.htmlelements.extension.DescriptionMethod;
+import io.qameta.htmlelements.extension.SelectorMethod;
 import org.hamcrest.Matcher;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -12,10 +12,10 @@ import java.util.function.Predicate;
 
 public interface ExtendedWebElement<FluentType> extends WebBlock, WebElement, Locatable {
 
-    @Selector
+    @SelectorMethod
     String getSelector();
 
-    @Description
+    @DescriptionMethod
     String getDescription();
 
     default FluentType waitUntil(String description, Predicate<FluentType> predicate) {

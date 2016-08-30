@@ -12,9 +12,9 @@ import java.util.Map;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(Description.Handler.class)
-@ExtendWith(Description.Extension.class)
-public @interface Description {
+@HandleWith(DescriptionMethod.Handler.class)
+@ExtendWith(DescriptionMethod.Extension.class)
+public @interface DescriptionMethod {
 
     String DESCRIPTION_KEY = "description";
 

@@ -12,9 +12,9 @@ import java.util.Map;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(Selector.Handler.class)
-@ExtendWith(Selector.Extension.class)
-public @interface Selector {
+@HandleWith(SelectorMethod.Handler.class)
+@ExtendWith(SelectorMethod.Extension.class)
+public @interface SelectorMethod {
 
     String SELECTOR_KEY = "selector";
 
@@ -31,7 +31,7 @@ public @interface Selector {
     class Handler implements MethodHandler<String> {
 
         @Override
-        public String handle (Context context) {
+        public String handle (Context context ) {
             return context.getStore().get(SELECTOR_KEY).toString();
         }
 
