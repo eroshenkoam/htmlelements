@@ -4,6 +4,6 @@ import java.util.List;
 import java.util.function.Function;
 
 @Deprecated
-public interface HtmlElementList<T> extends List<T>, WebBlock, ExtendedList<T> {
+public interface HtmlElementList<T> extends List<T>, ExtendedList<T> {
 
 }

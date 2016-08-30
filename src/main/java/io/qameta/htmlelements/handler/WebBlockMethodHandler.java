@@ -3,7 +3,7 @@ package io.qameta.htmlelements.handler;
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.NotImplementedException;
-;import io.qameta.htmlelements.extension.ContextEnricher;
+import io.qameta.htmlelements.extension.ContextEnricher;
 import io.qameta.htmlelements.proxy.Proxies;
 import io.qameta.htmlelements.util.ReflectionUtils;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
@@ -70,11 +70,6 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
             return invokeDefaultMethod(proxy, method, args);
         }
 
-        //context
-        if (Context.class.equals(method.getReturnType())) {
-            return getContext();
-        }
-
         Class<T> targetClass = getTargetClass();
 
         // web element proxy
@@ -101,14 +96,14 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
             return invokeShouldMethod(proxy, method, args);
         }
 
-        // extension
-        if ("toString".equals(method.getName())) {
-            return String.format("{name: %s, selector: %s}",
-                    getContext().getName(),
-                    getContext().getSelector()
-            );
-        }
-
+//        // extension
+//        if ("toString".equals(method.getName())) {
+//            return String.format("{name: %s, selector: %s}",
+//                    getContext().getName(),
+//                    getContext().getSelector()
+//            );
+//        }
+//
         Class<?> proxyClass = method.getReturnType();
 
         // html element proxy (recurse)
@@ -116,7 +111,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
             String name = ReflectionUtils.getName(method, args);
             String selector = ReflectionUtils.getSelector(method, args);
 
-            Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
+            Context childContext = getContext().newChildContext(method.getReturnType());
             childContext.getRegistry().getExtensions(ContextEnricher.class)
                     .forEach(enricher -> enricher.enrich(childContext, method, args));
             return createProxy(method.getReturnType(), WebElement.class, childContext, () ->
@@ -129,7 +124,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
             String name = ReflectionUtils.getName(method, args);
             String selector = ReflectionUtils.getSelector(method, args);
 
-            Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
+            Context childContext = getContext().newChildContext(method.getReturnType());
             childContext.getRegistry().getExtensions(ContextEnricher.class)
                     .forEach(enricher -> enricher.enrich(childContext, method, args));
             return createProxy(method.getReturnType(), List.class, childContext, () -> {

@@ -1,7 +1,8 @@
 package io.qameta.htmlelements.element;
 
-import io.qameta.htmlelements.extension.DescriptionMethod;
-import io.qameta.htmlelements.extension.SelectorMethod;
+import io.qameta.htmlelements.extension.DescriptionProvider;
+import io.qameta.htmlelements.extension.DriverProvider;
+import io.qameta.htmlelements.extension.SelectorProvider;
 import org.hamcrest.Matcher;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -10,12 +11,15 @@ import org.openqa.selenium.internal.Locatable;
 
 import java.util.function.Predicate;
 
-public interface ExtendedWebElement<FluentType> extends WebBlock, WebElement, Locatable {
+public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
 
-    @SelectorMethod
+    @DriverProvider
+    WebDriver getDriver();
+
+    @SelectorProvider
     String getSelector();
 
-    @DescriptionMethod
+    @DescriptionProvider
     String getDescription();
 
     default FluentType waitUntil(String description, Predicate<FluentType> predicate) {
@@ -29,10 +33,6 @@ public interface ExtendedWebElement<FluentType> extends WebBlock, WebElement, Lo
     FluentType waitUntil(Predicate<FluentType> predicate);
 
     FluentType should(Matcher matcher);
-
-    default WebDriver getDriver() {
-        return getContext().getDriver();
-    }
 
     @SuppressWarnings("unchecked")
     default FluentType hover() {

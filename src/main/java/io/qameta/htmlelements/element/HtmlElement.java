@@ -1,14 +1,14 @@
 package io.qameta.htmlelements.element;
 
-import io.qameta.htmlelements.extension.DescriptionMethod;
-import io.qameta.htmlelements.extension.SelectorMethod;
+import io.qameta.htmlelements.extension.DescriptionProvider;
+import io.qameta.htmlelements.extension.SelectorProvider;
 
 public interface HtmlElement extends ExtendedWebElement<HtmlElement> {
 
-    @SelectorMethod
+    @SelectorProvider
     String getSelector();
 
-    @DescriptionMethod
+    @DescriptionProvider
     String getDescription();
 
 }

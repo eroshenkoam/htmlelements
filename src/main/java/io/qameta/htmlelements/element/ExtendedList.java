@@ -1,12 +1,20 @@
 package io.qameta.htmlelements.element;
 
+import io.qameta.htmlelements.extension.DescriptionProvider;
+import io.qameta.htmlelements.extension.SelectorProvider;
 import org.hamcrest.Matcher;
 
 import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-public interface ExtendedList<ItemType> extends WebBlock, List<ItemType> {
+public interface ExtendedList<ItemType> extends List<ItemType> {
+
+    @SelectorProvider
+    String getSelector();
+
+    @DescriptionProvider
+    String getDescription();
 
     default ExtendedList<ItemType> filter(String description, Predicate<ItemType> predicate) {
         return filter(predicate);

@@ -1,18 +1,11 @@
 package io.qameta.htmlelements;
 
-import io.qameta.htmlelements.element.HtmlElement;
-import io.qameta.htmlelements.element.HtmlElementList;
-import io.qameta.htmlelements.example.element.SuggestItem;
 import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 import org.openqa.selenium.WebElement;
 
-import java.util.List;
-
-import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
-import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
 import static org.hamcrest.Matchers.*;
 
 public class MatcherTest {
@@ -26,7 +19,7 @@ public class MatcherTest {
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
 
-        System.out.println(searchPage.searchArrow().getSelector());
+        System.out.println(searchPage.searchArrow().getDriver());
 
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)

@@ -1,19 +1,12 @@
 package io.qameta.htmlelements.context;
 
 import io.qameta.htmlelements.extension.ExtensionRegistry;
-import io.qameta.htmlelements.util.ReflectionUtils;
 import org.openqa.selenium.WebDriver;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class Context {
-
-    private String name;
-
-    private String selector;
-
-    private WebDriver driver;
 
     private Context parent;
 
@@ -23,30 +16,6 @@ public class Context {
 
     private Context() {
         this.store = new HashMap<>();
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    private void setName(String name) {
-        this.name = name;
-    }
-
-    public String getSelector() {
-        return selector;
-    }
-
-    private void setSelector(String selector) {
-        this.selector = selector;
-    }
-
-    public WebDriver getDriver() {
-        return driver;
-    }
-
-    private void setDriver(WebDriver driver) {
-        this.driver = driver;
     }
 
     public Context getParent() {
@@ -73,21 +42,17 @@ public class Context {
         this.registry = registry;
     }
 
-    public Context newChildContext(String name, String selector, Class<?> proxyClass) {
+    public Context newChildContext(Class<?> proxyClass) {
         Context childContext = new Context();
         childContext.setRegistry(ExtensionRegistry.create(proxyClass));
-        childContext.setDriver(this.getDriver());
-        childContext.setSelector(selector);
         childContext.setParent(this);
-        childContext.setName(name);
         return childContext;
     }
 
     public static Context newWebPageContext(WebDriver driver, Class<?> webPageClass) {
         Context context = new Context();
         context.setRegistry(ExtensionRegistry.create(webPageClass));
-        context.setName(ReflectionUtils.getName(webPageClass));
-        context.setDriver(driver);
+        context.getStore().put("driver", driver);
         return context;
     }
 

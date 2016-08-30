@@ -1,6 +1,6 @@
 package io.qameta.htmlelements.extension;
 
-import io.qameta.htmlelements.annotation.FindBy;
+
 import io.qameta.htmlelements.context.Context;
 
 import java.lang.annotation.ElementType;
@@ -12,29 +12,28 @@ import java.util.Map;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(SelectorMethod.Handler.class)
-@ExtendWith(SelectorMethod.Extension.class)
-public @interface SelectorMethod {
+@HandleWith(DescriptionProvider.Handler.class)
+@ExtendWith(DescriptionProvider.Extension.class)
+public @interface DescriptionProvider {
 
-    String SELECTOR_KEY = "selector";
+    String DESCRIPTION_KEY = "description";
 
     class Extension implements ContextEnricher {
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
             Map<String, Object> store = context.getStore();
-            String selector = method.getAnnotation(FindBy.class).value();
-            store.put(SELECTOR_KEY, selector);
+            String description = method.getName();
+            store.put(DESCRIPTION_KEY, description);
         }
     }
 
     class Handler implements MethodHandler<String> {
 
         @Override
-        public String handle (Context context ) {
-            return context.getStore().get(SELECTOR_KEY).toString();
+        public String handle(Context context) {
+            return context.getStore().get(DESCRIPTION_KEY).toString();
         }
 
     }
-
 }
