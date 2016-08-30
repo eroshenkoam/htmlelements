@@ -25,11 +25,8 @@ public class MatcherTest {
         WebPageFactory pageObjectFactory = new WebPageFactory();
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
-//        searchPage.searchArrow()
-//                .waitUntil("displayed", WebElement::isDisplayed)
-//                .should(hasText("search-arrow"));
 
-        System.out.println(searchPage.searchArrow().suggest().get(0).title().getText());
+        System.out.println(searchPage.searchArrow().getSelector());
 
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)

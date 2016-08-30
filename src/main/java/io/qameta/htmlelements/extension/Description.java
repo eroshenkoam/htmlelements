@@ -12,17 +12,13 @@ import java.util.Map;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@HandleWith(Description.Handler.class)
 @ExtendWith(Description.Extension.class)
 public @interface Description {
 
-    class Extension implements ContextEnricher, ContextMethodInterceptor<String> {
+    String DESCRIPTION_KEY = "description";
 
-        private static final String DESCRIPTION_KEY = "description";
-
-        @Override
-        public String intercept(Context context) {
-            return context.getStore().get(DESCRIPTION_KEY).toString();
-        }
+    class Extension implements ContextEnricher {
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
@@ -30,5 +26,14 @@ public @interface Description {
             String description = method.getName();
             store.put(DESCRIPTION_KEY, description);
         }
+    }
+
+    class Handler implements MethodHandler<String> {
+
+        @Override
+        public String handle(Context context) {
+            return context.getStore().get(DESCRIPTION_KEY).toString();
+        }
+
     }
 }

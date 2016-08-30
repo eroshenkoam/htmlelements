@@ -3,10 +3,10 @@ package io.qameta.htmlelements.util;
 import com.google.common.base.Joiner;
 import io.qameta.htmlelements.annotation.Description;
 import io.qameta.htmlelements.annotation.FindBy;
-import io.qameta.htmlelements.annotation.Name;
 import io.qameta.htmlelements.annotation.Param;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.reflect.ConstructorUtils;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -20,13 +20,9 @@ import static java.util.Arrays.stream;
 
 public class ReflectionUtils {
 
-    private static List<Class<?>> getAllInterfaces(Class<?>[] classes) {
-        List<Class<?>> result = new ArrayList<>();
-
-        Arrays.stream(classes).forEach(clazz -> {
-            result.addAll(ClassUtils.getAllInterfaces(clazz));
-            result.add(clazz);
-        });
+    private static List<Class<?>> getAllInterfaces(Class<?> clazz) {
+        List<Class<?>> result = ClassUtils.getAllInterfaces(clazz);
+        result.add(clazz);
         return result;
     }
 
@@ -52,11 +48,6 @@ public class ReflectionUtils {
                         .flatMap(m -> stream(m.getDeclaredMethods()))
                         .map(Method::getName)
         ).collect(Collectors.toList());
-    public static List<String> getMethods(Class<?>[] classes) {
-        return getAllInterfaces(classes).stream()
-                .flatMap(m -> stream(m.getDeclaredMethods()))
-                .map(Method::getName)
-                .collect(Collectors.toList());
     }
 
     public static Map<String, String> getParameters(Method method, Object[] args) {

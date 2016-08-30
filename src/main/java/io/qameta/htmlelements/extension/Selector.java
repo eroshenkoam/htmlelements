@@ -12,17 +12,13 @@ import java.util.Map;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@HandleWith(Selector.Handler.class)
 @ExtendWith(Selector.Extension.class)
 public @interface Selector {
 
-    class Extension implements ContextEnricher, ContextMethodInterceptor<String> {
+    String SELECTOR_KEY = "selector";
 
-        private static final String SELECTOR_KEY = "selector";
-
-        @Override
-        public String intercept(Context context) {
-            return context.getStore().get(SELECTOR_KEY).toString();
-        }
+    class Extension implements ContextEnricher {
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
@@ -30,6 +26,15 @@ public @interface Selector {
             String selector = method.getAnnotation(FindBy.class).value();
             store.put(SELECTOR_KEY, selector);
         }
+    }
+
+    class Handler implements MethodHandler<String> {
+
+        @Override
+        public String handle (Context context) {
+            return context.getStore().get(SELECTOR_KEY).toString();
+        }
+
     }
 
 }
