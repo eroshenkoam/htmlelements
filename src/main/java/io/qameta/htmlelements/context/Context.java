@@ -1,5 +1,6 @@
 package io.qameta.htmlelements.context;
 
+import io.qameta.htmlelements.extension.ExtensionRegistry;
 import io.qameta.htmlelements.util.ReflectionUtils;
 import org.openqa.selenium.WebDriver;
 
@@ -17,6 +18,8 @@ public class Context {
     private Context parent;
 
     private Map<String, Object> store;
+
+    private ExtensionRegistry registry;
 
     private Context() {
         this.store = new HashMap<>();
@@ -62,8 +65,17 @@ public class Context {
         return store;
     }
 
+    public ExtensionRegistry getRegistry() {
+        return registry;
+    }
+
+    private void setRegistry(ExtensionRegistry registry) {
+        this.registry = registry;
+    }
+
     public Context newChildContext(String name, String selector, Class<?> proxyClass) {
         Context childContext = new Context();
+        childContext.setRegistry(ExtensionRegistry.create(proxyClass));
         childContext.setDriver(this.getDriver());
         childContext.setSelector(selector);
         childContext.setParent(this);
@@ -71,8 +83,9 @@ public class Context {
         return childContext;
     }
 
-    public static Context newWebPageContext(Class<?> webPageClass, WebDriver driver) {
+    public static Context newWebPageContext(WebDriver driver, Class<?> webPageClass) {
         Context context = new Context();
+        context.setRegistry(ExtensionRegistry.create(webPageClass));
         context.setName(ReflectionUtils.getName(webPageClass));
         context.setDriver(driver);
         return context;

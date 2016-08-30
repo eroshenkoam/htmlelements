@@ -11,7 +11,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Locatable;
 
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Constructor;
@@ -28,33 +27,33 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static io.qameta.htmlelements.util.ReflectionUtils.getMethods;
+import static io.qameta.htmlelements.util.ReflectionUtils.getMethodsNames;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class WebBlockMethodHandler implements InvocationHandler {
+public class WebBlockMethodHandler<T> implements InvocationHandler {
 
     private static final String FILTER_KEY = "filter";
 
     private static final String CONVERTER_KEY = "convert";
 
-    private final Supplier targetProvider;
+    private final Supplier<T> targetProvider;
 
     private final Context context;
 
-    private final Class[] targetClasses;
+    private final Class<T> targetClass;
 
-    public WebBlockMethodHandler(Context context, Supplier targetProvider, Class... targetClasses) {
+    public WebBlockMethodHandler(Context context, Class<T> targetClass, Supplier<T> targetProvider) {
         this.targetProvider = targetProvider;
-        this.targetClasses = targetClasses;
+        this.targetClass = targetClass;
         this.context = context;
     }
 
-    private Class[] getTargetClasses() {
-        return targetClasses;
+    private Class<T> getTargetClass() {
+        return targetClass;
     }
 
-    private Supplier getTargetProvider() {
+    private Supplier<T> getTargetProvider() {
         return this.targetProvider;
     }
 
@@ -75,10 +74,10 @@ public class WebBlockMethodHandler implements InvocationHandler {
             return getContext();
         }
 
-        Class<?>[] targetClasses = getTargetClasses();
+        Class<T> targetClass = getTargetClass();
 
         // web element proxy
-        if (getMethods(targetClasses).contains(method.getName())) {
+        if (getMethodsNames(targetClass).contains(method.getName())) {
             return invokeTargetMethod(getTargetProvider(), method, args);
         }
 
@@ -111,35 +110,30 @@ public class WebBlockMethodHandler implements InvocationHandler {
 
         Class<?> proxyClass = method.getReturnType();
 
+        String name = ReflectionUtils.getName(method, args);
+        String selector = ReflectionUtils.getSelector(method, args);
+
+        Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
+        context.getRegistry().getExtensions(ContextEnricher.class)
+                .forEach(enricher -> enricher.enrich(context, method, args));
+
         // html element proxy (recurse)
         if (method.isAnnotationPresent(FindBy.class) && WebElement.class.isAssignableFrom(proxyClass)) {
-            String name = ReflectionUtils.getName(method, args);
-            String selector = ReflectionUtils.getSelector(method, args);
-            Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
-
-            return createProxy(
-                    method.getReturnType(),
-                    childContext,
-                    () -> ((SearchContext) proxy).findElement(By.xpath(selector)),
-                    WebElement.class, Locatable.class
+            return createProxy(method.getReturnType(), WebElement.class, childContext, () ->
+                    ((SearchContext) proxy).findElement(By.xpath(selector))
             );
         }
 
         // html element list proxy (recurse)
         if (method.isAnnotationPresent(FindBy.class) && List.class.isAssignableFrom(method.getReturnType())) {
-            String name = ReflectionUtils.getName(method, args);
-            String selector = ReflectionUtils.getSelector(method, args);
-            Context childContext = getContext().newChildContext(name, selector, method.getReturnType());
-
-            return createProxy(method.getReturnType(), childContext, () -> {
+            return createProxy(method.getReturnType(), List.class, childContext, () -> {
                 List<WebElement> originalElements = ((SearchContext) proxy).findElements(By.xpath(selector));
                 Type methodReturnType = ((ParameterizedType) method
                         .getGenericReturnType()).getActualTypeArguments()[0];
                 return (List) originalElements.stream()
-                        .map(element -> createProxy((Class<?>) methodReturnType, childContext,
-                                () -> element, WebElement.class, Locatable.class))
+                        .map(element -> createProxy((Class<?>) methodReturnType, WebElement.class, childContext, () -> element))
                         .collect(toList());
-            }, List.class);
+            });
         }
 
         throw new NotImplementedException(method);
@@ -157,10 +151,10 @@ public class WebBlockMethodHandler implements InvocationHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Object invokeTargetMethod(Supplier<?> targetProvider, Method method, Object[] args)
+    private Object invokeTargetMethod(Supplier<T> targetProvider, Method method, Object[] args)
             throws Throwable {
         return ((SlowLoadableComponent<Object>) () -> {
-            if (List.class.isAssignableFrom(getTargetClasses()[0])) {
+            if (List.class.isAssignableFrom(getTargetClass())) {
 
                 Stream targetStream = ((List) targetProvider.get()).stream();
 
@@ -225,10 +219,10 @@ public class WebBlockMethodHandler implements InvocationHandler {
         return proxy;
     }
 
-    private Object createProxy(Class<?> proxyClass, Context context,
-                               Supplier supplier, Class... targetClass) {
+    private <R> Object createProxy(Class<?> proxyClass, Class<R> targetClass,
+                                   Context context, Supplier<R> supplier) {
         return Proxies.simpleProxy(
-                proxyClass, new WebBlockMethodHandler(context, supplier, targetClass)
+                proxyClass, new WebBlockMethodHandler<>(context, targetClass, supplier)
         );
     }
 

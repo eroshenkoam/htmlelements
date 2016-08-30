@@ -9,7 +9,6 @@ import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +30,28 @@ public class ReflectionUtils {
         return result;
     }
 
+    public static <T> T newInstance(Class<T> clazz) {
+        try {
+            return ConstructorUtils.invokeConstructor(clazz);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public static List<Method> getMethods(Class<?> clazz) {
+
+        return getAllInterfaces(clazz).stream()
+                .flatMap(m -> stream(m.getDeclaredMethods()))
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getMethodsNames(Class<?> clazz, String... additional) {
+        return Stream.concat(
+                Arrays.stream(additional),
+                getAllInterfaces(clazz).stream()
+                        .flatMap(m -> stream(m.getDeclaredMethods()))
+                        .map(Method::getName)
+        ).collect(Collectors.toList());
     public static List<String> getMethods(Class<?>[] classes) {
         return getAllInterfaces(classes).stream()
                 .flatMap(m -> stream(m.getDeclaredMethods()))
