@@ -2,6 +2,7 @@ package io.qameta.htmlelements;
 
 import io.qameta.htmlelements.element.HtmlElement;
 import io.qameta.htmlelements.element.HtmlElementList;
+import io.qameta.htmlelements.example.element.SuggestItem;
 import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
@@ -28,10 +29,7 @@ public class MatcherTest {
 //                .waitUntil("displayed", WebElement::isDisplayed)
 //                .should(hasText("search-arrow"));
 
-        System.out.println(searchPage.searchArrow().suggest().filter(WebElement::isDisplayed).size());
-        System.out.println(searchPage.searchArrow().suggest().filter(WebElement::isDisplayed).size());
-        System.out.println(searchPage.searchArrow().suggest().filter(WebElement::isDisplayed).size());
-        System.out.println(searchPage.searchArrow().suggest().filter(WebElement::isDisplayed).size());
+        System.out.println(searchPage.searchArrow().suggest().get(0).title().getText());
 
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)

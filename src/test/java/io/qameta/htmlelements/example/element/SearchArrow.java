@@ -9,7 +9,7 @@ import io.qameta.htmlelements.example.TestData;
 /**
  * @author Artem Eroshenko <erosenkoam@me.com>
  */
-public interface SearchArrow extends WithSuggest, HtmlElement {
+public interface SearchArrow extends WithSuggest<SearchArrow>, ExtendedWebElement<SearchArrow> {
 
     @Name("form {{ className }}")
     @FindBy(TestData.SEARCH_FORM_TEMPLATE)

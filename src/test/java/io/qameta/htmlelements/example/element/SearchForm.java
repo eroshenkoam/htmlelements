@@ -9,7 +9,7 @@ import org.openqa.selenium.WebElement;
 /**
  * @author Artem Eroshenko <erosenkoam@me.com>
  */
-public interface SearchForm extends HtmlElement {
+public interface SearchForm extends ExtendedWebElement<SearchForm> {
 
     @FindBy(TestData.REQUEST_INPUT_XPATH)
     WebElement input();
