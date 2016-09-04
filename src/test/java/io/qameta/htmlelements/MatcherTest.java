@@ -6,6 +6,8 @@ import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 import org.openqa.selenium.WebElement;
 
+import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
+import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
 import static org.hamcrest.Matchers.*;
 
 public class MatcherTest {
@@ -22,6 +24,12 @@ public class MatcherTest {
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)
                 .should(hasSize(2));
+
+        searchPage.searchArrow()
+                .should(displayed());
+
+        searchPage.searchArrow()
+                .waitUntil(hasText("search-arrow"));
 
         searchPage.searchArrow().suggest()
                 .convert(WebElement::getText)

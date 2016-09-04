@@ -8,9 +8,7 @@ import io.qameta.htmlelements.extension.TargetModifier;
 import io.qameta.htmlelements.proxy.Proxies;
 import io.qameta.htmlelements.util.ReflectionUtils;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
-import org.hamcrest.Matcher;
 import org.openqa.selenium.By;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
@@ -20,24 +18,13 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static io.qameta.htmlelements.util.ReflectionUtils.getMethodsNames;
 import static java.util.stream.Collectors.toList;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 public class WebBlockMethodHandler<T> implements InvocationHandler {
-
-    private static final String FILTER_KEY = "filter";
-
-    private static final String CONVERTER_KEY = "convert";
 
     private final Supplier<T> targetProvider;
 
@@ -76,16 +63,6 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         // web element proxy
         if (getMethodsNames(targetClass).contains(method.getName())) {
             return invokeTargetMethod(getTargetProvider(), method, args);
-        }
-
-        // extension
-        if ("waitUntil".equals(method.getName())) {
-            return invokeWaitUntilMethod(proxy, method, args);
-        }
-
-        // extension
-        if ("should".equals(method.getName())) {
-            return invokeShouldMethod(proxy, method, args);
         }
 
         Class<?> proxyClass = method.getReturnType();
@@ -154,26 +131,6 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
                 Object target = targetProvider.get();
                 return method.invoke(target, args);
             }
-        }).get();
-    }
-
-    @SuppressWarnings({"unchecked", "unused"})
-    private Object invokeShouldMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        Matcher matcher = (Matcher) args[0];
-        return ((SlowLoadableComponent<Object>) () -> {
-            assertThat(proxy, matcher);
-            return proxy;
-        }).get();
-    }
-
-    @SuppressWarnings({"unchecked", "unused"})
-    private Object invokeWaitUntilMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        Predicate predicate = (Predicate) args[0];
-        return ((SlowLoadableComponent<Object>) () -> {
-            if (predicate.test(proxy)) {
-                return proxy;
-            }
-            throw new NoSuchElementException("No such element exception");
         }).get();
     }
 

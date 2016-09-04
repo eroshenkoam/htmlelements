@@ -4,6 +4,8 @@ import io.qameta.htmlelements.extension.ConvertMethod;
 import io.qameta.htmlelements.extension.DescriptionProvider;
 import io.qameta.htmlelements.extension.FilterMethod;
 import io.qameta.htmlelements.extension.SelectorProvider;
+import io.qameta.htmlelements.extension.ShouldMethod;
+import io.qameta.htmlelements.extension.WaitUntilMethod;
 import org.hamcrest.Matcher;
 
 import java.util.List;
@@ -21,6 +23,15 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
     @FilterMethod
     ExtendedList<ItemType> filter(Predicate<ItemType> predicate);
 
+    @ConvertMethod
+    <R> ExtendedList<R> convert(Function<ItemType, R> function);
+
+    @ShouldMethod
+    ExtendedList<ItemType> should(Matcher matcher);
+
+    @WaitUntilMethod
+    ExtendedList<ItemType> waitUntil(Predicate<ExtendedList<ItemType>> predicate);
+
     default ExtendedList<ItemType> filter(String description, Predicate<ItemType> predicate) {
         return filter(predicate);
     }
@@ -29,9 +40,6 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
         return filter(matcher::matches);
     }
 
-    @ConvertMethod
-    <R> ExtendedList<R> convert(Function<ItemType, R> function);
-
     default ExtendedList<ItemType> waitUntil(String description, Predicate<ExtendedList<ItemType>> predicate) {
         return waitUntil(predicate);
     }
@@ -39,9 +47,5 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
     default ExtendedList<ItemType> waitUntil(Matcher matcher) {
         return waitUntil(matcher.toString(), matcher::matches);
     }
-
-    ExtendedList<ItemType> waitUntil(Predicate<ExtendedList<ItemType>> predicate);
-
-    ExtendedList<ItemType> should(Matcher matcher);
 
 }
