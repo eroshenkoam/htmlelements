@@ -19,8 +19,6 @@ public class MatcherTest {
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
 
-        System.out.println(searchPage.searchArrow().getDriver());
-
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)
                 .should(hasSize(2));

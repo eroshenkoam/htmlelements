@@ -49,7 +49,7 @@ public class Context {
         return childContext;
     }
 
-    public static Context newWebPageContext(WebDriver driver, Class<?> webPageClass) {
+    public static Context newWebPageContext(Class<?> webPageClass, WebDriver driver) {
         Context context = new Context();
         context.setRegistry(ExtensionRegistry.create(webPageClass));
         context.getStore().put("driver", driver);

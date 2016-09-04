@@ -26,7 +26,6 @@ public @interface DriverProvider {
                 context.getStore().put(DRIVER_KEY, driver);
             }
         }
-
     }
 
     class Handler implements MethodHandler<WebDriver> {
