@@ -5,6 +5,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class Context {
 
@@ -18,8 +19,8 @@ public class Context {
         this.store = new HashMap<>();
     }
 
-    public Context getParent() {
-        return parent;
+    public Optional<Context> getParent() {
+        return Optional.ofNullable(parent);
     }
 
     public boolean hasParent() {

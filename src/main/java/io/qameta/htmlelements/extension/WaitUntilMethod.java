@@ -12,10 +12,10 @@ import java.util.function.Predicate;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(WaitUntilMethod.Handler.class)
+@HandleWith(WaitUntilMethod.Extension.class)
 public @interface WaitUntilMethod {
 
-    class Handler implements MethodHandler<Object> {
+    class Extension implements MethodHandler<Object> {
 
         @Override
         @SuppressWarnings("unchecked")

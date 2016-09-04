@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(FilterMethod.Handler.class)
+@HandleWith(FilterMethod.Extension.class)
 @ExtendWith(FilterMethod.Extension.class)
 public @interface FilterMethod {
 
-    String FILTER_KEY = "filter";
+    class Extension implements ContextEnricher, TargetModifier<List>, MethodHandler<Object> {
 
-    class Extension implements ContextEnricher, TargetModifier<List> {
+        private static final String FILTER_KEY = "filter";
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
@@ -32,9 +32,6 @@ public @interface FilterMethod {
             Predicate predicate = (Predicate) context.getStore().get(FILTER_KEY);
             return (List) target.stream().filter(predicate).collect(Collectors.toList());
         }
-    }
-
-    class Handler implements MethodHandler {
 
         @Override
         @SuppressWarnings("unchecked")
@@ -45,5 +42,4 @@ public @interface FilterMethod {
             return proxy;
         }
     }
-
 }

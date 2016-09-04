@@ -11,13 +11,13 @@ import java.util.Map;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(DescriptionProvider.Handler.class)
+@HandleWith(DescriptionProvider.Extension.class)
 @ExtendWith(DescriptionProvider.Extension.class)
 public @interface DescriptionProvider {
 
-    String DESCRIPTION_KEY = "description";
+    class Extension implements ContextEnricher, MethodHandler<String> {
 
-    class Extension implements ContextEnricher {
+        private static final String DESCRIPTION_KEY = "description";
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
@@ -25,14 +25,11 @@ public @interface DescriptionProvider {
             String description = method.getName();
             store.put(DESCRIPTION_KEY, description);
         }
-    }
-
-    class Handler implements MethodHandler<String> {
 
         @Override
         public String handle(Context context, Object proxy, Object[] args) {
             return context.getStore().get(DESCRIPTION_KEY).toString();
         }
-
     }
+
 }

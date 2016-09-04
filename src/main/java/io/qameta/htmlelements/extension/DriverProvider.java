@@ -11,30 +11,26 @@ import java.lang.reflect.Method;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(DriverProvider.Handler.class)
+@HandleWith(DriverProvider.Extension.class)
 @ExtendWith(DriverProvider.Extension.class)
 public @interface DriverProvider {
 
-    String DRIVER_KEY = "driver";
+    class Extension implements ContextEnricher, MethodHandler<WebDriver> {
 
-    class Extension implements ContextEnricher {
+        private static final String DRIVER_KEY = "driver";
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
-            if (context.hasParent()) {
-                WebDriver driver = (WebDriver) context.getParent().getStore().get(DRIVER_KEY);
+            context.getParent().ifPresent(parent -> {
+                WebDriver driver = (WebDriver) parent.getStore().get(DRIVER_KEY);
                 context.getStore().put(DRIVER_KEY, driver);
-            }
+            });
         }
-    }
-
-    class Handler implements MethodHandler<WebDriver> {
 
         @Override
         public WebDriver handle(Context context, Object proxy, Object[] args) {
             return (WebDriver) context.getStore().get(DRIVER_KEY);
         }
-
     }
 
 }

@@ -3,7 +3,6 @@ package io.qameta.htmlelements.extension;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
 import org.hamcrest.Matcher;
-import org.openqa.selenium.NoSuchElementException;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,10 +13,10 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(ShouldMethod.Handler.class)
+@HandleWith(ShouldMethod.Extension.class)
 public @interface ShouldMethod {
 
-    class Handler implements MethodHandler<Object> {
+    class Extension implements MethodHandler<Object> {
 
         @Override
         @SuppressWarnings("unchecked")

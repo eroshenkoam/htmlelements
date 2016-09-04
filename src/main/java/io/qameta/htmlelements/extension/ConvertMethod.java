@@ -13,13 +13,13 @@ import java.util.stream.Collectors;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(ConvertMethod.Handler.class)
+@HandleWith(ConvertMethod.Extension.class)
 @ExtendWith(ConvertMethod.Extension.class)
 public @interface ConvertMethod {
 
-    String CONVERTER_KEY = "convert";
+    class Extension implements ContextEnricher, TargetModifier<List>, MethodHandler {
 
-    class Extension implements ContextEnricher, TargetModifier<List> {
+        static final String CONVERTER_KEY = "convert";
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
@@ -32,9 +32,6 @@ public @interface ConvertMethod {
             Function converter = (Function) context.getStore().get(CONVERTER_KEY);
             return (List) target.stream().map(converter).collect(Collectors.toList());
         }
-    }
-
-    class Handler implements MethodHandler {
 
         @Override
         @SuppressWarnings("unchecked")
