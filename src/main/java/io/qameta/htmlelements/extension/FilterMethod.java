@@ -17,28 +17,24 @@ import java.util.stream.Collectors;
 @ExtendWith(FilterMethod.Extension.class)
 public @interface FilterMethod {
 
-    class Extension implements ContextEnricher, TargetModifier<List>, MethodHandler<Object> {
+    class Extension implements TargetModifier<List>, MethodHandler<Object> {
 
         private static final String FILTER_KEY = "filter";
 
         @Override
-        public void enrich(Context context, Method method, Object[] args) {
-            context.getStore().put(FILTER_KEY, (Predicate) o -> true);
+        @SuppressWarnings("unchecked")
+        public Object handle(Context context, Object proxy, Object[] args) {
+            Predicate filter = context.getStore().get(FILTER_KEY, Predicate.class).orElse(o -> true);
+            context.getStore().put(FILTER_KEY, filter.and((Predicate) args[0]));
+            return proxy;
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public List modify(Context context, List target) {
-            Predicate filter = (Predicate) context.getStore().get(FILTER_KEY);
+            Predicate filter = context.getStore().get(FILTER_KEY, Predicate.class).orElse(o -> true);
             return (List) target.stream().filter(filter).collect(Collectors.toList());
         }
 
-        @Override
-        @SuppressWarnings("unchecked")
-        public Object handle(Context context, Object proxy, Object[] args) {
-            Predicate filter = (Predicate) context.getStore().get(FILTER_KEY);
-            context.getStore().put(FILTER_KEY, filter.and((Predicate) args[0]));
-            return proxy;
-        }
     }
 }

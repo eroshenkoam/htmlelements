@@ -17,26 +17,21 @@ import java.util.stream.Collectors;
 @ExtendWith(ConvertMethod.Extension.class)
 public @interface ConvertMethod {
 
-    class Extension implements ContextEnricher, TargetModifier<List>, MethodHandler {
+    class Extension implements TargetModifier<List>, MethodHandler {
 
         static final String CONVERTER_KEY = "convert";
 
         @Override
-        public void enrich(Context context, Method method, Object[] args) {
-            context.getStore().put(CONVERTER_KEY, (Function) o -> o);
-        }
-
-        @Override
         @SuppressWarnings("unchecked")
         public List modify(Context context, List target) {
-            Function converter = (Function) context.getStore().get(CONVERTER_KEY);
+            Function converter = context.getStore().get(CONVERTER_KEY, Function.class).orElse(o -> o);
             return (List) target.stream().map(converter).collect(Collectors.toList());
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public Object handle(Context context, Object proxy, Object[] args) {
-            Function converter = (Function) context.getStore().get(CONVERTER_KEY);
+            Function converter = context.getStore().get(CONVERTER_KEY, Function.class).orElse(o -> o);
             context.getStore().put(CONVERTER_KEY, converter.andThen((Function) args[0]));
             return proxy;
         }

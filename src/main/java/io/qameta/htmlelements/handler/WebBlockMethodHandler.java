@@ -119,13 +119,10 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
             throws Throwable {
         return ((SlowLoadableComponent<Object>) () -> {
             if (List.class.isAssignableFrom(getTargetClass())) {
-
-                List target = ((List) targetProvider.get());
-
-                for (TargetModifier<List<?>> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
+                Object target = targetProvider.get();
+                for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
                     target = modifier.modify(getContext(), target);
                 }
-
                 return method.invoke(target, args);
             } else {
                 Object target = targetProvider.get();

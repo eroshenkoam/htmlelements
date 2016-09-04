@@ -8,6 +8,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.NoSuchElementException;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -22,14 +23,16 @@ public @interface DriverProvider {
         @Override
         public void enrich(Context context, Method method, Object[] args) {
             context.getParent().ifPresent(parent -> {
-                WebDriver driver = (WebDriver) parent.getStore().get(DRIVER_KEY);
-                context.getStore().put(DRIVER_KEY, driver);
+                parent.getStore().get(DRIVER_KEY, WebDriver.class).ifPresent(driver -> {
+                    context.getStore().put(DRIVER_KEY, driver);
+                });
             });
         }
 
         @Override
         public WebDriver handle(Context context, Object proxy, Object[] args) {
-            return (WebDriver) context.getStore().get(DRIVER_KEY);
+            return context.getStore().get(DRIVER_KEY, WebDriver.class)
+                    .orElseThrow(() -> new NoSuchElementException("Missing driver"));
         }
     }
 

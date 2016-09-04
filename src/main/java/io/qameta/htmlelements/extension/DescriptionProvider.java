@@ -7,7 +7,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.util.Map;
+import java.util.NoSuchElementException;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -21,14 +21,13 @@ public @interface DescriptionProvider {
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
-            Map<String, Object> store = context.getStore();
-            String description = method.getName();
-            store.put(DESCRIPTION_KEY, description);
+            context.getStore().put(DESCRIPTION_KEY, method.getName());
         }
 
         @Override
         public String handle(Context context, Object proxy, Object[] args) {
-            return context.getStore().get(DESCRIPTION_KEY).toString();
+            return context.getStore().get(DESCRIPTION_KEY, String.class)
+                    .orElseThrow(() -> new NoSuchElementException("Missing description"));
         }
     }
 

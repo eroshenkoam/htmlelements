@@ -3,35 +3,29 @@ package io.qameta.htmlelements.context;
 import io.qameta.htmlelements.extension.ExtensionRegistry;
 import org.openqa.selenium.WebDriver;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 public class Context {
 
     private Context parent;
 
-    private Map<String, Object> store;
+    private Store store;
 
     private ExtensionRegistry registry;
 
     private Context() {
-        this.store = new HashMap<>();
+        this.store = new DefaultStore();
     }
 
     public Optional<Context> getParent() {
         return Optional.ofNullable(parent);
     }
 
-    public boolean hasParent() {
-        return parent != null;
-    }
-
     private void setParent(Context parent) {
         this.parent = parent;
     }
 
-    public Map<String, Object> getStore() {
+    public Store getStore() {
         return store;
     }
 
