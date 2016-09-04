@@ -1,6 +1,8 @@
 package io.qameta.htmlelements.element;
 
+import io.qameta.htmlelements.extension.ConvertMethod;
 import io.qameta.htmlelements.extension.DescriptionProvider;
+import io.qameta.htmlelements.extension.FilterMethod;
 import io.qameta.htmlelements.extension.SelectorProvider;
 import org.hamcrest.Matcher;
 
@@ -16,6 +18,9 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
     @DescriptionProvider
     String getDescription();
 
+    @FilterMethod
+    ExtendedList<ItemType> filter(Predicate<ItemType> predicate);
+
     default ExtendedList<ItemType> filter(String description, Predicate<ItemType> predicate) {
         return filter(predicate);
     }
@@ -24,8 +29,7 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
         return filter(matcher::matches);
     }
 
-    ExtendedList<ItemType> filter(Predicate<ItemType> predicate);
-
+    @ConvertMethod
     <R> ExtendedList<R> convert(Function<ItemType, R> function);
 
     default ExtendedList<ItemType> waitUntil(String description, Predicate<ExtendedList<ItemType>> predicate) {

@@ -83,27 +83,10 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         }
 
         // extension
-        if ("filter".equals(method.getName())) {
-            return invokeFilterMethod(proxy, method, args);
-        }
-
-        if ("convert".equals(method.getName())) {
-            return invokeConvertMethod(proxy, method, args);
-        }
-
-        // extension
         if ("should".equals(method.getName())) {
             return invokeShouldMethod(proxy, method, args);
         }
 
-//        // extension
-//        if ("toString".equals(method.getName())) {
-//            return String.format("{name: %s, selector: %s}",
-//                    getContext().getName(),
-//                    getContext().getSelector()
-//            );
-//        }
-//
         Class<?> proxyClass = method.getReturnType();
 
         // html element proxy (recurse)
@@ -139,7 +122,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
 
         return getContext().getRegistry().getHandler(method)
                 .orElseThrow(() -> new NotImplementedException(method))
-                .handle(getContext());
+                .handle(getContext(), proxy, args);
     }
 
     private Object invokeDefaultMethod(Object proxy, Method method, Object[] args) throws Throwable {
@@ -161,17 +144,11 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
 
                 Stream targetStream = ((List) targetProvider.get()).stream();
 
-                List<Predicate> filters = getContext().getStore().containsKey(FILTER_KEY) ?
-                        (List<Predicate>) getContext().getStore().get(FILTER_KEY) : new ArrayList<>();
-                for (Predicate filter : filters) {
-                    targetStream = targetStream.filter(filter);
-                }
+                Predicate filter = (Predicate) getContext().getStore().get(FILTER_KEY);
+                targetStream = targetStream.filter(filter);
 
-                List<Function> converters = getContext().getStore().containsKey(CONVERTER_KEY) ?
-                        (List<Function>) getContext().getStore().get(CONVERTER_KEY) : new ArrayList<>();
-                for (Function converter : converters) {
-                    targetStream = targetStream.map(converter);
-                }
+                Function converter = (Function) getContext().getStore().get(CONVERTER_KEY);
+                targetStream = targetStream.map(converter);
 
                 Object target = targetStream.collect(Collectors.toList());
                 return method.invoke(target, args);
@@ -200,26 +177,6 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
             }
             throw new NoSuchElementException("No such element exception");
         }).get();
-    }
-
-    @SuppressWarnings({"unchecked", "unused"})
-    private Object invokeFilterMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        Map<String, Object> store = getContext().getStore();
-        List<Predicate> predicates = store.containsKey(FILTER_KEY) ?
-                (List<Predicate>) store.get(FILTER_KEY) : new ArrayList<>();
-        predicates.add((Predicate) args[0]);
-        store.put(FILTER_KEY, predicates);
-        return proxy;
-    }
-
-    @SuppressWarnings({"unchecked", "unused"})
-    private Object invokeConvertMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        Map<String, Object> store = getContext().getStore();
-        List<Function> matchers = store.containsKey(CONVERTER_KEY) ?
-                (List<Function>) store.get(CONVERTER_KEY) : new ArrayList<>();
-        matchers.add((Function) args[0]);
-        store.put(CONVERTER_KEY, matchers);
-        return proxy;
     }
 
     private <R> Object createProxy(Class<?> proxyClass, Class<R> targetClass,

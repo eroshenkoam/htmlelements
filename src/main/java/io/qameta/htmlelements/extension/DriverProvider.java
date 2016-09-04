@@ -31,9 +31,10 @@ public @interface DriverProvider {
     class Handler implements MethodHandler<WebDriver> {
 
         @Override
-        public WebDriver handle(Context context) {
+        public WebDriver handle(Context context, Object proxy, Object[] args) {
             return (WebDriver) context.getStore().get(DRIVER_KEY);
         }
+
     }
 
 }

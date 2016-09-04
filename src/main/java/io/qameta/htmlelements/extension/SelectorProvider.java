@@ -31,7 +31,7 @@ public @interface SelectorProvider {
     class Handler implements MethodHandler<String> {
 
         @Override
-        public String handle (Context context ) {
+        public String handle(Context context, Object proxy, Object[] args) {
             return context.getStore().get(SELECTOR_KEY).toString();
         }
 

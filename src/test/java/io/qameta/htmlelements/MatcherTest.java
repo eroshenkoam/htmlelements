@@ -24,6 +24,10 @@ public class MatcherTest {
                 .should(hasSize(2));
 
         searchPage.searchArrow().suggest()
+                .convert(WebElement::getText)
+                .forEach(System.out::println);
+
+        searchPage.searchArrow().suggest()
                 .should(everyItem(notNullValue()));
     }
 

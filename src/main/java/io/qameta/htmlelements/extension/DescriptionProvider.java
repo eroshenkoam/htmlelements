@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.extension;
 
-
 import io.qameta.htmlelements.context.Context;
 
 import java.lang.annotation.ElementType;
@@ -31,7 +30,7 @@ public @interface DescriptionProvider {
     class Handler implements MethodHandler<String> {
 
         @Override
-        public String handle(Context context) {
+        public String handle(Context context, Object proxy, Object[] args) {
             return context.getStore().get(DESCRIPTION_KEY).toString();
         }
 
