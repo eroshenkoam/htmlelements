@@ -7,8 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.function.Function;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -16,13 +17,20 @@ import java.util.function.Predicate;
 @ExtendWith(ConvertMethod.Extension.class)
 public @interface ConvertMethod {
 
-    String CONVERT_KEY = "convert";
+    String CONVERTER_KEY = "convert";
 
-    class Extension implements ContextEnricher {
+    class Extension implements ContextEnricher, TargetModifier<List> {
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
-            context.getStore().put(CONVERT_KEY, (Function) o -> o);
+            context.getStore().put(CONVERTER_KEY, (Function) o -> o);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public List modify(Context context, List target) {
+            Function converter = (Function) context.getStore().get(CONVERTER_KEY);
+            return (List) target.stream().map(converter).collect(Collectors.toList());
         }
     }
 
@@ -31,9 +39,9 @@ public @interface ConvertMethod {
         @Override
         @SuppressWarnings("unchecked")
         public Object handle(Context context, Object proxy, Object[] args) {
-            Function currentFunction = (Function) context.getStore().get(CONVERT_KEY);
+            Function currentFunction = (Function) context.getStore().get(CONVERTER_KEY);
             Function newFunction = (Function) args[0];
-            context.getStore().put(CONVERT_KEY, currentFunction.andThen(newFunction));
+            context.getStore().put(CONVERTER_KEY, currentFunction.andThen(newFunction));
             return proxy;
         }
     }

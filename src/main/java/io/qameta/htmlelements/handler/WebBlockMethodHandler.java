@@ -4,6 +4,7 @@ import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.NotImplementedException;
 import io.qameta.htmlelements.extension.ContextEnricher;
+import io.qameta.htmlelements.extension.TargetModifier;
 import io.qameta.htmlelements.proxy.Proxies;
 import io.qameta.htmlelements.util.ReflectionUtils;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
@@ -142,15 +143,12 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         return ((SlowLoadableComponent<Object>) () -> {
             if (List.class.isAssignableFrom(getTargetClass())) {
 
-                Stream targetStream = ((List) targetProvider.get()).stream();
+                List target = ((List) targetProvider.get());
 
-                Predicate filter = (Predicate) getContext().getStore().get(FILTER_KEY);
-                targetStream = targetStream.filter(filter);
+                for (TargetModifier<List<?>> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
+                    target = modifier.modify(getContext(), target);
+                }
 
-                Function converter = (Function) getContext().getStore().get(CONVERTER_KEY);
-                targetStream = targetStream.map(converter);
-
-                Object target = targetStream.collect(Collectors.toList());
                 return method.invoke(target, args);
             } else {
                 Object target = targetProvider.get();

@@ -7,7 +7,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
@@ -17,11 +19,18 @@ public @interface FilterMethod {
 
     String FILTER_KEY = "filter";
 
-    class Extension implements ContextEnricher {
+    class Extension implements ContextEnricher, TargetModifier<List> {
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
             context.getStore().put(FILTER_KEY, (Predicate) o -> true);
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
+        public List modify(Context context, List target) {
+            Predicate predicate = (Predicate) context.getStore().get(FILTER_KEY);
+            return (List) target.stream().filter(predicate).collect(Collectors.toList());
         }
     }
 
