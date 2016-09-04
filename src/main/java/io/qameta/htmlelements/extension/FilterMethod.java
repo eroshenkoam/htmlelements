@@ -29,16 +29,15 @@ public @interface FilterMethod {
         @Override
         @SuppressWarnings("unchecked")
         public List modify(Context context, List target) {
-            Predicate predicate = (Predicate) context.getStore().get(FILTER_KEY);
-            return (List) target.stream().filter(predicate).collect(Collectors.toList());
+            Predicate filter = (Predicate) context.getStore().get(FILTER_KEY);
+            return (List) target.stream().filter(filter).collect(Collectors.toList());
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public Object handle(Context context, Object proxy, Object[] args) {
-            Predicate currentPredicate = (Predicate) context.getStore().get(FILTER_KEY);
-            Predicate newPredicate = (Predicate) args[0];
-            context.getStore().put(FILTER_KEY, currentPredicate.and(newPredicate));
+            Predicate filter = (Predicate) context.getStore().get(FILTER_KEY);
+            context.getStore().put(FILTER_KEY, filter.and((Predicate) args[0]));
             return proxy;
         }
     }

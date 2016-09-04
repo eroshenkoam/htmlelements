@@ -23,7 +23,6 @@ public @interface WaitUntilMethod {
             Predicate predicate = (Predicate) args[0];
             return ((SlowLoadableComponent<Object>) () -> {
                 if (predicate.test(proxy)) {
-
                     return proxy;
                 }
                 throw new NoSuchElementException("No such element exception");

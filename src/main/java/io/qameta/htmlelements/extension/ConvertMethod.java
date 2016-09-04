@@ -36,9 +36,8 @@ public @interface ConvertMethod {
         @Override
         @SuppressWarnings("unchecked")
         public Object handle(Context context, Object proxy, Object[] args) {
-            Function currentFunction = (Function) context.getStore().get(CONVERTER_KEY);
-            Function newFunction = (Function) args[0];
-            context.getStore().put(CONVERTER_KEY, currentFunction.andThen(newFunction));
+            Function converter = (Function) context.getStore().get(CONVERTER_KEY);
+            context.getStore().put(CONVERTER_KEY, converter.andThen((Function) args[0]));
             return proxy;
         }
     }
