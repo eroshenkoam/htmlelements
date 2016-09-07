@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.element;
 
-import io.qameta.htmlelements.extension.DefaultMethod;
 import io.qameta.htmlelements.extension.DescriptionProvider;
 import io.qameta.htmlelements.extension.DriverProvider;
 import io.qameta.htmlelements.extension.SelectorProvider;
@@ -31,17 +30,14 @@ public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
     @ShouldMethod
     FluentType should(Matcher matcher);
 
-    @DefaultMethod
     default FluentType waitUntil(String description, Predicate<FluentType> predicate) {
         return waitUntil(predicate);
     }
 
-    @DefaultMethod
     default FluentType waitUntil(Matcher matcher) {
         return waitUntil(matcher.toString(), matcher::matches);
     }
 
-    @DefaultMethod
     @SuppressWarnings("unchecked")
     default FluentType hover() {
         Actions actions = new Actions(getDriver());

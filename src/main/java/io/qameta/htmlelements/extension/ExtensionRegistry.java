@@ -64,6 +64,10 @@ public class ExtensionRegistry {
     }
 
     public Optional<? extends MethodHandler> getHandler(Method method) {
+        //TODO: нужно добавть стратегию
+        if (method.isDefault()) {
+            return Optional.of(new DefaultMethod.Extension());
+        }
         return Optional.of(getHandlers().get(method));
     }
 
