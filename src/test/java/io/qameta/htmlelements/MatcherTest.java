@@ -41,6 +41,8 @@ public class MatcherTest {
         searchPage.searchArrow().suggest()
                 .should(everyItem(notNullValue()));
 
+        searchPage.searchArrow().hover();
+
     }
 
 
