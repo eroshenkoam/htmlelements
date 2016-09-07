@@ -1,5 +1,7 @@
 package io.qameta.htmlelements;
 
+import io.qameta.htmlelements.element.HtmlElement;
+import io.qameta.htmlelements.example.element.SuggestItem;
 import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
@@ -32,11 +34,15 @@ public class MatcherTest {
                 .waitUntil(hasText("search-arrow"));
 
         searchPage.searchArrow().suggest()
-                .convert(WebElement::getText)
+                .convert(SuggestItem::title)
+                .convert(HtmlElement::getDescription)
                 .forEach(System.out::println);
 
         searchPage.searchArrow().suggest()
                 .should(everyItem(notNullValue()));
+
+        searchPage.searchArrow()
+                .hover();
     }
 
 

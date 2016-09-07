@@ -30,7 +30,7 @@ public @interface DriverProvider {
         }
 
         @Override
-        public WebDriver handle(Context context, Object proxy, Object[] args) {
+        public WebDriver handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
             return context.getStore().get(DRIVER_KEY, WebDriver.class)
                     .orElseThrow(() -> new NoSuchElementException("Missing driver"));
         }

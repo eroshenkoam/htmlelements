@@ -1,6 +1,7 @@
 package io.qameta.htmlelements.extension;
 
 import io.qameta.htmlelements.context.Context;
+import org.openqa.selenium.WebDriver;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,18 +24,19 @@ public @interface ConvertMethod {
 
         @Override
         @SuppressWarnings("unchecked")
+        public Object handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
+            Function converter = context.getStore().get(CONVERTER_KEY, Function.class).orElse(o -> o);
+            context.getStore().put(CONVERTER_KEY, converter.andThen((Function) args[0]));
+            return proxy;
+        }
+
+        @Override
+        @SuppressWarnings("unchecked")
         public List modify(Context context, List target) {
             Function converter = context.getStore().get(CONVERTER_KEY, Function.class).orElse(o -> o);
             return (List) target.stream().map(converter).collect(Collectors.toList());
         }
 
-        @Override
-        @SuppressWarnings("unchecked")
-        public Object handle(Context context, Object proxy, Object[] args) {
-            Function converter = context.getStore().get(CONVERTER_KEY, Function.class).orElse(o -> o);
-            context.getStore().put(CONVERTER_KEY, converter.andThen((Function) args[0]));
-            return proxy;
-        }
     }
 
 }

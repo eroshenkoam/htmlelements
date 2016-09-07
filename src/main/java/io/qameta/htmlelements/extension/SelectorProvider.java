@@ -27,7 +27,7 @@ public @interface SelectorProvider {
         }
 
         @Override
-        public String handle(Context context, Object proxy, Object[] args) {
+        public String handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
             return context.getStore().get(SELECTOR_KEY, String.class)
                     .orElseThrow(() -> new NoSuchElementException("Missing selector"));
         }

@@ -12,8 +12,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
 
-import java.lang.invoke.MethodHandles;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -53,11 +51,6 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        // default
-        if (method.isDefault()) {
-            return invokeDefaultMethod(proxy, method, args);
-        }
-
         Class<T> targetClass = getTargetClass();
 
         // web element proxy
@@ -93,41 +86,29 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
                 Type methodReturnType = ((ParameterizedType) method
                         .getGenericReturnType()).getActualTypeArguments()[0];
                 return (List) originalElements.stream()
-                        .map(element -> createProxy((Class<?>) methodReturnType, WebElement.class, childContext, () -> element))
+                        .map(element -> createProxy((Class<?>) methodReturnType,
+                                WebElement.class,
+                                //здесь у нас нет description и selector
+                                childContext.newChildContext((Class<?>) methodReturnType),
+                                () -> element))
                         .collect(toList());
             });
         }
 
         return getContext().getRegistry().getHandler(method)
                 .orElseThrow(() -> new NotImplementedException(method))
-                .handle(getContext(), proxy, args);
-    }
-
-    private Object invokeDefaultMethod(Object proxy, Method method, Object[] args) throws Throwable {
-        Class<?> declaringClass = method.getDeclaringClass();
-        Constructor<MethodHandles.Lookup> constructor = MethodHandles.Lookup.class
-                .getDeclaredConstructor(Class.class, int.class);
-        constructor.setAccessible(true);
-        return constructor.newInstance(declaringClass, MethodHandles.Lookup.PRIVATE)
-                .unreflectSpecial(method, declaringClass)
-                .bindTo(proxy)
-                .invokeWithArguments(args);
+                .handle(getContext(), proxy, method, args);
     }
 
     @SuppressWarnings("unchecked")
     private Object invokeTargetMethod(Supplier<T> targetProvider, Method method, Object[] args)
             throws Throwable {
         return ((SlowLoadableComponent<Object>) () -> {
-            if (List.class.isAssignableFrom(getTargetClass())) {
-                Object target = targetProvider.get();
-                for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
-                    target = modifier.modify(getContext(), target);
-                }
-                return method.invoke(target, args);
-            } else {
-                Object target = targetProvider.get();
-                return method.invoke(target, args);
+            Object target = targetProvider.get();
+            for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
+                target = modifier.modify(getContext(), target);
             }
+            return method.invoke(target, args);
         }).get();
     }
 

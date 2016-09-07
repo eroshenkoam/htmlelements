@@ -23,7 +23,7 @@ public @interface FilterMethod {
 
         @Override
         @SuppressWarnings("unchecked")
-        public Object handle(Context context, Object proxy, Object[] args) {
+        public Object handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
             Predicate filter = context.getStore().get(FILTER_KEY, Predicate.class).orElse(o -> true);
             context.getStore().put(FILTER_KEY, filter.and((Predicate) args[0]));
             return proxy;

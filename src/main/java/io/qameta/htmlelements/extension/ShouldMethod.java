@@ -8,6 +8,7 @@ import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
+import java.lang.reflect.Method;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
@@ -20,7 +21,7 @@ public @interface ShouldMethod {
 
         @Override
         @SuppressWarnings("unchecked")
-        public Object handle(Context context, Object proxy, Object[] args) throws Throwable {
+        public Object handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
             Matcher matcher = (Matcher) args[0];
             return ((SlowLoadableComponent<Object>) () -> {
                 assertThat(proxy, matcher);
