@@ -68,7 +68,7 @@ public class ExtensionRegistry {
         if (method.isDefault()) {
             return Optional.of(new DefaultMethod.Extension());
         }
-        return Optional.of(getHandlers().get(method));
+        return Optional.ofNullable(getHandlers().get(method));
     }
 
     private static Optional<HandleWith> getHandleWithAnnotation(AnnotatedElement element) {

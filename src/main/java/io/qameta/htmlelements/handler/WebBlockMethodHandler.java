@@ -6,6 +6,7 @@ import io.qameta.htmlelements.extension.TargetModifier;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
 
 import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.function.Supplier;
 
@@ -43,7 +44,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         Class<T> targetClass = getTargetClass();
 
         // web element proxy
-        if (getMethodsNames(targetClass).contains(method.getName())) {
+        if (getMethodsNames(targetClass, "equals", "hasCode", "toString").contains(method.getName())) {
             return invokeTargetMethod(getTargetProvider(), method, args);
         }
 
@@ -55,13 +56,17 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     @SuppressWarnings("unchecked")
     private Object invokeTargetMethod(Supplier<T> targetProvider, Method method, Object[] args)
             throws Throwable {
-        return ((SlowLoadableComponent<Object>) () -> {
-            Object target = targetProvider.get();
-            for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
-                target = modifier.modify(getContext(), target);
-            }
-            return method.invoke(target, args);
-        }).get();
+        try {
+            return ((SlowLoadableComponent<Object>) () -> {
+                Object target = targetProvider.get();
+                for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
+                    target = modifier.modify(getContext(), target);
+                }
+                return method.invoke(target, args);
+            }).get();
+        } catch (InvocationTargetException e){
+            throw e.getCause();
+        }
     }
 
 }
