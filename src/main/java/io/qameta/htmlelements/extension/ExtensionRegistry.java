@@ -22,12 +22,12 @@ public class ExtensionRegistry {
                         .map(annotation -> annotation.annotationType().getAnnotation(ExtendWith.class).value())
                         .forEach(registry::registerExtension));
 
-        Map<Method, MethodHandler> handlers = new HashMap<>();
+        Map<String, MethodHandler> handlers = new HashMap<>();
         ReflectionUtils.getMethods(extensionClass).forEach(method -> {
             getHandleWithAnnotation(method).ifPresent(annotation -> {
                 Class<? extends MethodHandler> handlerClass = annotation.value();
                 MethodHandler handler = ReflectionUtils.newInstance(handlerClass);
-                handlers.put(method, handler);
+                handlers.put(method.getName(), handler);
             });
         });
 
@@ -37,7 +37,7 @@ public class ExtensionRegistry {
 
     private final Map<Class<? extends Extension>, Extension> extensions;
 
-    private final Map<Method, MethodHandler> handlers;
+    private final Map<String, MethodHandler> handlers;
 
     private ExtensionRegistry() {
         this.extensions = new HashMap<>();
@@ -59,7 +59,7 @@ public class ExtensionRegistry {
                 .collect(Collectors.toList());
     }
 
-    private Map<Method, MethodHandler> getHandlers() {
+    private Map<String, MethodHandler> getHandlers() {
         return handlers;
     }
 
@@ -68,7 +68,7 @@ public class ExtensionRegistry {
         if (method.isDefault()) {
             return Optional.of(new DefaultMethod.Extension());
         }
-        return Optional.ofNullable(getHandlers().get(method));
+        return Optional.ofNullable(getHandlers().get(method.getName()));
     }
 
     private static Optional<HandleWith> getHandleWithAnnotation(AnnotatedElement element) {

@@ -44,7 +44,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
         Class<T> targetClass = getTargetClass();
 
         // web element proxy
-        if (getMethodsNames(targetClass, "equals", "hasCode", "toString").contains(method.getName())) {
+        if (getMethodsNames(targetClass, "equals", "hasCode").contains(method.getName())) {
             return invokeTargetMethod(getTargetProvider(), method, args);
         }
 

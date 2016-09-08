@@ -62,7 +62,7 @@ public class ReflectionUtils {
         return parameters;
     }
 
-    public static String getName(Class<?> clazz) {
+    public static String getDescription(Class<?> clazz) {
         return splitCamelCase(clazz.getSimpleName());
     }
 
@@ -75,7 +75,7 @@ public class ReflectionUtils {
         return selector;
     }
 
-    public static String getName(Method method, Object[] args) {
+    public static String getDescription(Method method, Object[] args) {
         if (method.isAnnotationPresent(Description.class)) {
             Map<String, String> parameters = getParameters(method, args);
             String name = method.getAnnotation(Description.class).value();

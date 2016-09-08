@@ -4,6 +4,7 @@ import io.qameta.htmlelements.extension.DescriptionProvider;
 import io.qameta.htmlelements.extension.HoverMethod;
 import io.qameta.htmlelements.extension.SelectorProvider;
 import io.qameta.htmlelements.extension.ShouldMethod;
+import io.qameta.htmlelements.extension.ToStringMethod;
 import io.qameta.htmlelements.extension.WaitUntilMethod;
 import org.hamcrest.Matcher;
 import org.openqa.selenium.WebElement;
@@ -27,6 +28,9 @@ public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
 
     @HoverMethod
     FluentType hover();
+
+    @ToStringMethod
+    String toString();
 
     default FluentType waitUntil(String description, Predicate<FluentType> predicate) {
         return waitUntil(predicate);
