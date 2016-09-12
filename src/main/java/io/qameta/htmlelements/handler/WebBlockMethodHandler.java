@@ -12,25 +12,25 @@ import java.util.function.Supplier;
 
 import static io.qameta.htmlelements.util.ReflectionUtils.getMethodsNames;
 
-public class WebBlockMethodHandler<T> implements InvocationHandler {
+public class WebBlockMethodHandler implements InvocationHandler {
 
-    private final Supplier<T> targetProvider;
+    private final Supplier targetProvider;
 
     private final Context context;
 
-    private final Class<T> targetClass;
+    private final Class[] targetClasses;
 
-    public WebBlockMethodHandler(Context context, Class<T> targetClass, Supplier<T> targetProvider) {
+    public WebBlockMethodHandler(Context context,Supplier targetProvider, Class... targetClasses) {
         this.targetProvider = targetProvider;
-        this.targetClass = targetClass;
+        this.targetClasses = targetClasses;
         this.context = context;
     }
 
-    private Class<T> getTargetClass() {
-        return targetClass;
+    private Class[] getTargetClasses() {
+        return targetClasses;
     }
 
-    private Supplier<T> getTargetProvider() {
+    private Supplier getTargetProvider() {
         return this.targetProvider;
     }
 
@@ -41,7 +41,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
 
-        Class<T> targetClass = getTargetClass();
+        Class[] targetClass = getTargetClasses();
 
         // web element proxy
         if (getMethodsNames(targetClass, "equals", "hasCode").contains(method.getName())) {
@@ -54,7 +54,7 @@ public class WebBlockMethodHandler<T> implements InvocationHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Object invokeTargetMethod(Supplier<T> targetProvider, Method method, Object[] args)
+    private Object invokeTargetMethod(Supplier targetProvider, Method method, Object[] args)
             throws Throwable {
         try {
             return ((SlowLoadableComponent<Object>) () -> {

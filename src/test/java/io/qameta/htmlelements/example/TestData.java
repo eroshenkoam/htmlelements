@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
  */
 public class TestData {
 
-    public static final String SEARCH_ARROW_XPATH = "//form[contains(@class, 'search2suggest2-form')]";
+    public static final String SEARCH_ARROW_XPATH = "//form[contains(@class, 'search2 suggest2-form')]";
 
     public static final String SUGGEST_XPATH = "//div[@class='suggest']";
 

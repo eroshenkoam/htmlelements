@@ -10,6 +10,7 @@ import io.qameta.htmlelements.util.ReflectionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.internal.Locatable;
 
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.ElementType;
@@ -43,8 +44,11 @@ public @interface FindBy {
                 Context childContext = context.newChildContext(method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)
                         .forEach(enricher -> enricher.enrich(childContext, method, args));
-                return createProxy(method.getReturnType(), WebElement.class, childContext, () ->
-                        ((SearchContext) proxy).findElement(By.xpath(selector))
+                return createProxy(
+                        method.getReturnType(),
+                        childContext,
+                        () -> ((SearchContext) proxy).findElement(By.xpath(selector)),
+                        WebElement.class, Locatable.class
                 );
             }
 
@@ -55,27 +59,30 @@ public @interface FindBy {
                 Context childContext = context.newChildContext(method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)
                         .forEach(enricher -> enricher.enrich(childContext, method, args));
-                return createProxy(method.getReturnType(), List.class, childContext, () -> {
-                    List<WebElement> originalElements = ((SearchContext) proxy).findElements(By.xpath(selector));
-                    Type methodReturnType = ((ParameterizedType) method
-                            .getGenericReturnType()).getActualTypeArguments()[0];
-                    return (List) originalElements.stream()
-                            .map(element -> createProxy((Class<?>) methodReturnType,
-                                    WebElement.class,
-                                    //здесь у нас нет description и selector
-                                    childContext.newChildContext((Class<?>) methodReturnType),
-                                    () -> element))
-                            .collect(toList());
-                });
+                return createProxy(
+                        method.getReturnType(),
+                        childContext,
+                        () -> {
+                            List<WebElement> originalElements = ((SearchContext) proxy).findElements(By.xpath(selector));
+                            Type methodReturnType = ((ParameterizedType) method
+                                    .getGenericReturnType()).getActualTypeArguments()[0];
+                            return (List) originalElements.stream()
+                                    .map(element -> createProxy((Class<?>) methodReturnType,
+                                            childContext.newChildContext((Class<?>) methodReturnType),
+                                            () -> element,
+                                            WebElement.class, Locatable.class))
+                                    .collect(toList());
+                        },
+                        List.class);
             }
 
             return null;
         }
 
-        private <R> Object createProxy(Class<?> proxyClass, Class<R> targetClass,
-                                       Context context, Supplier<R> supplier) {
+        private <R> Object createProxy(Class<?> proxyClass, Context context, Supplier<R> supplier,
+                                       Class<?>... targetClasses) {
             return Proxies.simpleProxy(
-                    proxyClass, new WebBlockMethodHandler<>(context, targetClass, supplier)
+                    proxyClass, new WebBlockMethodHandler(context, supplier, targetClasses)
             );
         }
 

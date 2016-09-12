@@ -9,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +21,6 @@ import static java.util.Arrays.stream;
 
 public class ReflectionUtils {
 
-    private static List<Class<?>> getAllInterfaces(Class<?> clazz) {
-        List<Class<?>> result = ClassUtils.getAllInterfaces(clazz);
-        result.add(clazz);
-        return result;
-    }
-
     public static <T> T newInstance(Class<T> clazz) {
         try {
             return ConstructorUtils.invokeConstructor(clazz);
@@ -34,14 +29,23 @@ public class ReflectionUtils {
         }
     }
 
-    public static List<Method> getMethods(Class<?> clazz) {
+    private static List<Class<?>> getAllInterfaces(Class<?>[] classes) {
+        List<Class<?>> result = new ArrayList<>();
+        Arrays.stream(classes).forEach(clazz -> {
+            result.addAll(ClassUtils.getAllInterfaces(clazz));
+            result.add(clazz);
+        });
+        return result;
+    }
+
+    public static List<Method> getMethods(Class<?>... clazz) {
 
         return getAllInterfaces(clazz).stream()
                 .flatMap(m -> stream(m.getDeclaredMethods()))
                 .collect(Collectors.toList());
     }
 
-    public static List<String> getMethodsNames(Class<?> clazz, String... additional) {
+    public static List<String> getMethodsNames(Class<?>[] clazz, String... additional) {
         return Stream.concat(
                 Arrays.stream(additional),
                 getAllInterfaces(clazz).stream()
