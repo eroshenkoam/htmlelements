@@ -41,6 +41,10 @@ public class Context {
         Context childContext = new Context();
         childContext.setRegistry(ExtensionRegistry.create(proxyClass));
         childContext.setParent(this);
+        //extension
+        getStore().get("driver", WebDriver.class).ifPresent(driver -> {
+            childContext.getStore().put("driver", driver);
+        });
         return childContext;
     }
 
