@@ -38,7 +38,6 @@ public class MatcherTest {
 
         searchPage.searchArrow().suggest()
                 .convert(SuggestItem::title)
-                .convert(HtmlElement::getDescription)
                 .forEach(System.out::println);
 
         searchPage.searchArrow().suggest()
