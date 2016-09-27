@@ -1,8 +1,6 @@
 package io.qameta.htmlelements.element;
 
-import io.qameta.htmlelements.extension.DescriptionProvider;
 import io.qameta.htmlelements.extension.HoverMethod;
-import io.qameta.htmlelements.extension.SelectorProvider;
 import io.qameta.htmlelements.extension.ShouldMethod;
 import io.qameta.htmlelements.extension.ToStringMethod;
 import io.qameta.htmlelements.extension.WaitUntilMethod;
@@ -13,12 +11,6 @@ import org.openqa.selenium.internal.Locatable;
 import java.util.function.Predicate;
 
 public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
-
-    @SelectorProvider
-    String getSelector();
-
-    @DescriptionProvider
-    String getDescription();
 
     @WaitUntilMethod
     FluentType waitUntil(Predicate<FluentType> predicate);

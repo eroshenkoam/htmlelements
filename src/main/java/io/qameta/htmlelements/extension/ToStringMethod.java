@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.extension;
 
-import io.qameta.htmlelements.annotation.Description;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.util.ReflectionUtils;
 
@@ -24,9 +23,8 @@ public @interface ToStringMethod {
         @Override
         public void enrich(Context context, Method method, Object[] args) {
             String description = ReflectionUtils.getDescription(method, args);
-            String selector = ReflectionUtils.getSelector(method, args);
 
-            context.getStore().put(TO_STRING_KEY, String.format("{name: %s, selector: %s}", description, selector));
+            context.getStore().put(TO_STRING_KEY, String.format("{name: %s}", description));
         }
 
         @Override
