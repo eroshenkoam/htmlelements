@@ -1,13 +1,19 @@
 package io.qameta.htmlelements.handler;
 
+import com.google.common.base.Function;
 import io.qameta.htmlelements.context.Context;
+import io.qameta.htmlelements.exception.MethodInvocationException;
 import io.qameta.htmlelements.exception.NotImplementedException;
 import io.qameta.htmlelements.extension.TargetModifier;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
+import org.openqa.selenium.TimeoutException;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static io.qameta.htmlelements.util.ReflectionUtils.getMethodsNames;
@@ -20,7 +26,7 @@ public class WebBlockMethodHandler implements InvocationHandler {
 
     private final Class[] targetClasses;
 
-    public WebBlockMethodHandler(Context context,Supplier targetProvider, Class... targetClasses) {
+    public WebBlockMethodHandler(Context context, Supplier targetProvider, Class... targetClasses) {
         this.targetProvider = targetProvider;
         this.targetClasses = targetClasses;
         this.context = context;
@@ -57,16 +63,24 @@ public class WebBlockMethodHandler implements InvocationHandler {
     private Object invokeTargetMethod(Supplier targetProvider, Method method, Object[] args)
             throws Throwable {
         try {
-            return ((SlowLoadableComponent<Object>) () -> {
-                Object target = targetProvider.get();
-                for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
-                    target = modifier.modify(getContext(), target);
-                }
-                return method.invoke(target, args);
-            }).get();
-        } catch (InvocationTargetException e){
+            return ((SlowLoadableComponent<Object>) () -> safeInvokeTargetMethod(targetProvider, method, args)).get();
+        } catch (MethodInvocationException e){
             throw e.getCause();
         }
     }
+
+    @SuppressWarnings("unchecked")
+    private Object safeInvokeTargetMethod(Supplier targetProvider, Method method, Object[] args) {
+        Object target = targetProvider.get();
+        for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
+            target = modifier.modify(getContext(), target);
+        }
+        try {
+            return method.invoke(target, args);
+        } catch (InvocationTargetException | IllegalAccessException e) {
+            throw new MethodInvocationException(e);
+        }
+    }
+
 
 }
