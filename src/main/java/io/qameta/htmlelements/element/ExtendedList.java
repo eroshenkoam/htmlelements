@@ -28,10 +28,10 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
     <R> ExtendedList<R> convert(Function<ItemType, R> function);
 
     @ShouldMethod
-    ExtendedList<ItemType> should(Matcher matcher);
+    ExtendedList<ItemType> should(String message, Matcher matcher);
 
     @WaitUntilMethod
-    ExtendedList<ItemType> waitUntil(Predicate<ExtendedList<ItemType>> predicate);
+    ExtendedList<ItemType> waitUntil(String message, Predicate<ExtendedList<ItemType>> predicate);
 
     @ToStringMethod
     String toString();
@@ -44,8 +44,13 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
         return filter(matcher::matches);
     }
 
-    default ExtendedList<ItemType> waitUntil(String description, Predicate<ExtendedList<ItemType>> predicate) {
-        return waitUntil(predicate);
+
+    default ExtendedList<ItemType> should(Matcher matcher) {
+        return should("", matcher);
+    }
+
+    default ExtendedList<ItemType> waitUntil(Predicate<ExtendedList<ItemType>> predicate) {
+        return waitUntil("", predicate);
     }
 
     default ExtendedList<ItemType> waitUntil(Matcher matcher) {

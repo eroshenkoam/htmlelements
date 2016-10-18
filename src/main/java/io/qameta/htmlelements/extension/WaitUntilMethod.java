@@ -25,13 +25,14 @@ public @interface WaitUntilMethod {
         @Override
         @SuppressWarnings("unchecked")
         public Object handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
-            Predicate predicate = (Predicate) args[0];
+            String message = (String) args[0];
+            Predicate predicate = (Predicate) args[1];
             WebDriver driver = context.getStore().get("driver", WebDriver.class)
                     .orElseThrow(() -> new RuntimeException("missing driver"));
 
             new WebDriverWait(driver, 5)
                     .ignoring(Throwable.class)
-                    .withMessage("No such element exception")
+                    .withMessage(message)
                     .until((Function<WebDriver, Boolean>) (d) -> predicate.test(proxy));
 
             return proxy;

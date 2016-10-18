@@ -13,10 +13,10 @@ import java.util.function.Predicate;
 public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
 
     @WaitUntilMethod
-    FluentType waitUntil(Predicate<FluentType> predicate);
+    FluentType waitUntil(String description, Predicate<FluentType> predicate);
 
     @ShouldMethod
-    FluentType should(Matcher matcher);
+    FluentType should(String message, Matcher matcher);
 
     @HoverMethod
     FluentType hover();
@@ -24,12 +24,20 @@ public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
     @ToStringMethod
     String toString();
 
-    default FluentType waitUntil(String description, Predicate<FluentType> predicate) {
-        return waitUntil(predicate);
+    default FluentType waitUntil(Predicate<FluentType> predicate) {
+        return waitUntil("", predicate);
     }
 
     default FluentType waitUntil(Matcher matcher) {
         return waitUntil(matcher.toString(), matcher::matches);
+    }
+
+    default FluentType waitUntil(String message, Matcher matcher) {
+        return waitUntil(message, matcher::matches);
+    }
+
+    default FluentType should(Matcher matcher) {
+        return should("", matcher);
     }
 
 }

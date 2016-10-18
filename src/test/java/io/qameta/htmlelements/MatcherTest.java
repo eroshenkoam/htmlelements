@@ -1,13 +1,11 @@
 package io.qameta.htmlelements;
 
-import io.qameta.htmlelements.element.HtmlElement;
 import io.qameta.htmlelements.example.element.SuggestItem;
 import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Locatable;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
@@ -34,7 +32,7 @@ public class MatcherTest {
                 .should(displayed());
 
         searchPage.searchArrow()
-                .waitUntil(hasText("search-arrow"));
+                .waitUntil(hasText("searcharrow"));
 
         searchPage.searchArrow().suggest()
                 .convert(SuggestItem::title)
@@ -44,6 +42,5 @@ public class MatcherTest {
                 .should(everyItem(notNullValue()));
 
     }
-
 
 }
