@@ -6,6 +6,7 @@ import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
 import org.junit.Test;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.interactions.Actions;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
@@ -32,7 +33,7 @@ public class MatcherTest {
                 .should(displayed());
 
         searchPage.searchArrow()
-                .waitUntil(hasText("searcharrow"));
+                .waitUntil(hasText("search-arrow"));
 
         searchPage.searchArrow().suggest()
                 .convert(SuggestItem::title)
