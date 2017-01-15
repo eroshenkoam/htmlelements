@@ -2,8 +2,6 @@ package io.qameta.htmlelements.extension;
 
 import com.google.common.base.Function;
 import io.qameta.htmlelements.context.Context;
-import io.qameta.htmlelements.waiter.SlowLoadableComponent;
-import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
@@ -12,7 +10,6 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
-import java.util.concurrent.TimeUnit;
 import java.util.function.Predicate;
 
 @Target(ElementType.METHOD)
