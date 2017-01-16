@@ -24,7 +24,7 @@ import static java.lang.String.format;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(GoMethod.Extension.class)
+@HandleWith(IsAtMethod.Extension.class)
 public @interface IsAtMethod {
 
     class Extension implements MethodHandler {
