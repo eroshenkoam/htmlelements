@@ -4,6 +4,9 @@ import java.util.Optional;
 
 public interface Store {
 
+    String DRIVER_KEY = "driver";
+    String BASE_URL_KEY = "baseUrl";
+
     Optional<Object> get(Object key);
 
     <T> Optional<T> get(Object key, Class<T> returnType);
