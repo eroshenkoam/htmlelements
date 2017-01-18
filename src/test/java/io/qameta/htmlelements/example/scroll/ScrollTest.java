@@ -2,6 +2,7 @@ package io.qameta.htmlelements.example.scroll;
 
 import io.github.bonigarcia.wdm.ChromeDriverManager;
 import io.qameta.htmlelements.WebPageFactory;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
@@ -29,5 +30,10 @@ public class ScrollTest {
         page.go();
         page.wikiList().scrollToElement();
         assertThat(page.wikiList(), displayed());
+    }
+
+    @After
+    public void shutdown(){
+        driver.quit();
     }
 }
