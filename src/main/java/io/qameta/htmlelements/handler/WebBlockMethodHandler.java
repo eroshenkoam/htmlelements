@@ -1,19 +1,14 @@
 package io.qameta.htmlelements.handler;
 
-import com.google.common.base.Function;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.MethodInvocationException;
 import io.qameta.htmlelements.exception.NotImplementedException;
 import io.qameta.htmlelements.extension.TargetModifier;
 import io.qameta.htmlelements.waiter.SlowLoadableComponent;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.function.Supplier;
 
 import static io.qameta.htmlelements.util.ReflectionUtils.getMethodsNames;
@@ -82,5 +77,7 @@ public class WebBlockMethodHandler implements InvocationHandler {
         }
     }
 
-
+    public Object getUnwrappedObject() {
+        return targetProvider.get();
+    }
 }
