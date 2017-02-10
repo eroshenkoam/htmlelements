@@ -28,18 +28,8 @@ public @interface HoverMethod {
         public Object handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
             WebDriver driver = context.getStore().get(DRIVER_KEY, WebDriver.class)
                     .orElseThrow(() -> new WebPageException("WebDriver is missing"));
-
-            try {
-                new WebDriverWait(driver, 5)
-                        .ignoring(AssertionError.class)
-                        .until((Predicate<WebDriver>) (d) -> {
-                            Actions actions = new Actions(driver);
-                            actions.moveToElement((WebElement) proxy).perform();
-                            return true;
-                        });
-            } catch (TimeoutException e) {
-                throw e.getCause();
-            }
+            Actions actions = new Actions(driver);
+            actions.moveToElement((WebElement) proxy).perform();
             return proxy;
         }
     }

@@ -35,12 +35,11 @@ public @interface IsAtMethod {
             Matcher<String> expectedUrlMacher = (Matcher<String>) args[0];
             WebDriver driver = context.getStore().get(DRIVER_KEY, WebDriver.class)
                     .orElseThrow(() -> new WebPageException("WebDriver is missing"));
-
-            new WebDriverWait(driver, 5)
-                    .ignoring(Throwable.class)
-                    .withMessage(format("Couldn't wait for page with url %s to load", expectedUrlMacher))
-                    .until((Predicate<WebDriver>) (d) -> (d != null && expectedUrlMacher.matches(d.getCurrentUrl())) &&
-                            WebDriverUtils.pageIsLoaded(d));
+            boolean isAtAddress = expectedUrlMacher.matches(driver.getCurrentUrl());
+            boolean isReady = WebDriverUtils.pageIsLoaded(driver);
+            if (!(isAtAddress && isReady)) {
+                throw new WebPageException(format("Couldn't wait for page with url %s to load", expectedUrlMacher));
+            }
             return proxy;
         }
     }

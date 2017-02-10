@@ -1,6 +1,7 @@
 package io.qameta.htmlelements;
 
 import io.qameta.htmlelements.extension.DriverProvider;
+import io.qameta.htmlelements.extension.Retry;
 import io.qameta.htmlelements.extension.page.GoMethod;
 import io.qameta.htmlelements.extension.page.IsAtMethod;
 import org.hamcrest.Matcher;
@@ -19,6 +20,7 @@ public interface WebPage extends WrapsDriver, SearchContext {
     @GoMethod
     void go();
 
+    @Retry
     @IsAtMethod
     void isAt(Matcher<String> url);
 
