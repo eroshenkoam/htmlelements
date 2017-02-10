@@ -1,17 +1,17 @@
 package io.qameta.htmlelements;
 
-import io.qameta.htmlelements.example.element.SuggestItem;
-import io.qameta.htmlelements.statement.Listener;
-import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
+import io.qameta.htmlelements.example.element.SuggestItem;
 import io.qameta.htmlelements.example.page.SearchPage;
+import io.qameta.htmlelements.statement.Listener;
 import org.junit.Test;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 import java.lang.reflect.Method;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
+import static io.qameta.htmlelements.matcher.EnabledMatcher.enabled;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
@@ -38,10 +38,14 @@ public class MatcherTest {
 
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)
+                .filter(WebElement::isEnabled)
                 .should(hasSize(2));
 
         searchPage.searchArrow()
                 .should(displayed());
+
+        searchPage.searchArrow()
+                .should(enabled());
 
         searchPage.searchArrow()
                 .waitUntil("", hasText("search-arrow"), 10);
