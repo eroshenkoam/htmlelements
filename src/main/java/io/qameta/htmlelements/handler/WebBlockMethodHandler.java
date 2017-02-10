@@ -3,8 +3,10 @@ package io.qameta.htmlelements.handler;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.MethodInvocationException;
 import io.qameta.htmlelements.exception.NotImplementedException;
+import io.qameta.htmlelements.extension.MethodHandler;
+import io.qameta.htmlelements.extension.Retry;
 import io.qameta.htmlelements.extension.TargetModifier;
-import io.qameta.htmlelements.waiter.SlowLoadableComponent;
+import io.qameta.htmlelements.waiter.Waiter;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
@@ -44,22 +46,34 @@ public class WebBlockMethodHandler implements InvocationHandler {
 
         Class[] targetClass = getTargetClasses();
 
-        // web element proxy
-        if (getMethodsNames(targetClass, "equals", "hashCode").contains(method.getName())) {
-            return invokeTargetMethod(getTargetProvider(), method, args);
+        int timeout = 0;
+        int pooling = 0;
+
+        if (method.isAnnotationPresent(Retry.class)) {
+            Retry retry = method.getAnnotation(Retry.class);
+            timeout = retry.timeout();
+            pooling = retry.pooling();
         }
 
-        return getContext().getRegistry().getHandler(method)
-                .orElseThrow(() -> new NotImplementedException(method))
-                .handle(getContext(), proxy, method, args);
+        // web element proxy
+        if (getMethodsNames(targetClass, "equals", "hashCode").contains(method.getName())) {
+            return invokeTargetMethod(timeout, pooling, getTargetProvider(), method, args);
+        }
+
+        MethodHandler<Object> handler = getContext().getRegistry().getHandler(method)
+                .orElseThrow(() -> new NotImplementedException(method));
+
+        return ((Waiter<Object>) () -> handler.handle(getContext(), proxy, method, args))
+                .get(timeout, pooling);
     }
 
     @SuppressWarnings("unchecked")
-    private Object invokeTargetMethod(Supplier targetProvider, Method method, Object[] args)
+    private Object invokeTargetMethod(int timeout, int pooling, Supplier targetProvider, Method method, Object[] args)
             throws Throwable {
         try {
-            return ((SlowLoadableComponent<Object>) () -> safeInvokeTargetMethod(targetProvider, method, args)).get();
-        } catch (MethodInvocationException e){
+            return ((Waiter<Object>) () -> safeInvokeTargetMethod(targetProvider, method, args))
+                    .get(timeout, pooling);
+        } catch (MethodInvocationException e) {
             throw e.getCause();
         }
     }

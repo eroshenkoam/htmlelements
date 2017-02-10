@@ -27,13 +27,13 @@ public class MatcherTest {
 
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)
-                .should(hasSize(2));
+                .should("has size", hasSize(1));
 
         searchPage.searchArrow()
-                .should(displayed());
+                .should("displayed", displayed());
 
         searchPage.searchArrow()
-                .waitUntil(hasText("search-arrow"));
+                .waitUntil("wait until", hasText("search-arrow"));
 
         searchPage.searchArrow().suggest()
                 .convert(SuggestItem::title)
