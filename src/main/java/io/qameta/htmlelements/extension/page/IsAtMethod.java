@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.extension.page;
 
-import com.google.common.base.Predicate;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.WebPageException;
 import io.qameta.htmlelements.extension.HandleWith;
@@ -8,7 +7,6 @@ import io.qameta.htmlelements.extension.MethodHandler;
 import io.qameta.htmlelements.util.WebDriverUtils;
 import org.hamcrest.Matcher;
 import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

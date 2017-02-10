@@ -1,13 +1,10 @@
 package io.qameta.htmlelements.extension;
 
-import com.google.common.base.Predicate;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.WebPageException;
-import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
