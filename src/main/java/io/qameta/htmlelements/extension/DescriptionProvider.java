@@ -9,6 +9,8 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.util.NoSuchElementException;
 
+import static io.qameta.htmlelements.context.Store.DESCRIPTION_KEY;
+
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @HandleWith(DescriptionProvider.Extension.class)
@@ -16,8 +18,6 @@ import java.util.NoSuchElementException;
 public @interface DescriptionProvider {
 
     class Extension implements ContextEnricher, MethodHandler<String> {
-
-        private static final String DESCRIPTION_KEY = "description";
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
