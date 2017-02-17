@@ -8,7 +8,7 @@ import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
-import static io.qameta.htmlelements.matcher.HasClassMatcher.hasClass;
+import static io.qameta.htmlelements.matcher.HasAttributeMatcher.hasClass;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
 import static org.hamcrest.Matchers.*;
 
