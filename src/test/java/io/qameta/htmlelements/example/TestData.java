@@ -1,17 +1,13 @@
 package io.qameta.htmlelements.example;
 
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static io.qameta.htmlelements.example.TestData.WebElementBuilder.mockWebElement;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -62,6 +58,7 @@ public class TestData {
                 .withChildElements(SUGGEST_XPATH, suggest)
                 .withChildElement(SEARCH_FORM_XPATH, searchForm)
                 .withText("search-arro", "search", "search-arrow")
+                .withClass("search2 suggest2-form suggest2-form__node i-bem search2_js_inited")
                 .withDisplayed(true)
                 .build();
 
@@ -99,6 +96,11 @@ public class TestData {
 
         public WebElementBuilder withDisplayed(boolean displayed, Boolean... other) {
             when(getElement().isDisplayed()).thenReturn(displayed, other);
+            return this;
+        }
+
+        public WebElementBuilder withClass(String className, String... other) {
+            when(getElement().getAttribute("class")).thenReturn(className, other);
             return this;
         }
 
