@@ -1,0 +1,100 @@
+== Features
+After you have described your web pages, it's time to start organizing the logic of working with them.
+We prefer to use a BDD approach, where you break down all interaction logic into simple actions and create
+one "step" method per action as it's implementation. This is where all the extension methods from ExtendedWebElement
+and ExtendedList classes come in handy.
+
+We will use harmcrest matchers for conditioning
+[source, xml]
+----
+<dependency>
+   <groupId>org.hamcrest</groupId>
+   <artifactId>hamcrest-all</artifactId>
+   <version>1.3</version>
+</dependency>
+----
+
+=== Working with elements
+*Waiting on a condition for a single element.*
+`ExtendedWebElement` have two different extension methods for waiting.
+
+First - `waitUntil(Matcher matcher)` which waits with a configurable timeout and polling on some condition
+in a passed matcher, throwing `java.lang.RuntimeException` if condition has not been satisfied.
+[source, java]
+----
+@Step("Make search with input string «{}»")
+    public SearchPageSteps makeSearch(String input){
+        final SearchForm form = onSearchPage().searchPanel().form();
+        form.waitUntil(WebElement::isDisplayed) //waits for element to satisfy a condition
+                .sendKeys(input); //invokes standard WebElement's method
+        form.submit();
+        return this;
+    }
+----
+
+Second - `should(Matcher matcher)` which waits the same way on a passed matcher, but throwing
+`java.lang.AssertionError` instead.
+[source, java]
+----
+@Step("Check user «{}» is found")
+    public SearchPageSteps checkUserIsFound(String userName){
+        onSearchPage().resultsPanel().user(userName)
+        .should("User is not found", WebElement::isDisplayed);
+        //makes a waiting assertion here
+        return this;
+    }
+----
+
+*Performing actions on elements.* There're not many built-in extension methods for actions, since it would clutter the
+`WebElement` 's api too much. Instead it's better to introduce your own custom methods only when you actually need them.
+To show how this idea works we made a `ScrollableElement` and an additional `hover()` method for the `ExtendedWebElement`.
+
+[source, java]
+----
+@Step("Check current user info tooltip is shown")
+    public SearchPageSteps checkUserInfoTooltip(String userName){
+        onSearchPage().toolbar().currentUserIcon()
+                .hover(); //invokes new Actions().moveToElement(element)
+        onSearchPage().userTooltip()
+        .should("A tooltip should be displayed for user's avatar", Matchers::isDisplayed)
+        //making first assertion that tooltip is shown
+        .userName()  // going to the child element in the same chain of calls
+        .should("Unexpected user in tooltip", hasText(input))  //second assertion
+        return this;
+    }
+----
+
+`ScrollableElement` is just a very simple class introducing single `scrollToElement()` method.
+Annotation `@ScrollMethod` points to method's implementation.
+[source, java]
+----
+public interface ScrollableElement extends ExtendedWebElement {
+
+    @ScrollMethod
+    void scrollToElement();
+}
+----
+
+Now to perform a scroll you just need to specify it as a type for an element.
+[source, java]
+----
+public interface Footer extends ScrollableElement<Footer> {
+
+  @FindBy(".//div[@class = 'support-chat-button']")
+  ExtendedWebElement supportChatButton();
+}
+----
+
+Then you will be able to scroll to the actual footer of your page like this:
+[source, java]
+----
+@Step("Start a chat with support")
+    public SearchPageSteps startSupportChat(){
+        onSearchPage().footer().scrollToElement();
+        onSearchPage().footer().supportChatButton()
+        .waitUntil(WebElement::isDisplayed) //waiting for scroll to finish before click
+        .click()
+        return this;
+    }
+----
+

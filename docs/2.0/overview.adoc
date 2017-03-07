@@ -1,0 +1,17 @@
+== Overview
+HtmlElements 2 has several basic entities that you will be working with:
+
+*WebPage* - instances of this class will serve as top classes of your page objects hierarchy.
+
+*WebPageFactory* - returns WebPage instances that are wrapped around the given driver.
+[source, java]
+----
+WebPageFactory factory = new WebPageFactory();
+SearchPage page = factory.get(driver, SearchPage.class);
+----
+
+*ExtendedWebElement* - is a parent interface for every web element you will be using in your tests.
+
+*ExtendedList* - an interface, which provides everything to work with a collection of ExtendedWebElements.
+
+
