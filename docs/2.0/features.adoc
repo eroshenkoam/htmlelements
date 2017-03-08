@@ -1,18 +1,11 @@
 == Features
-After you have described your web pages, it's time to start organizing the logic of working with them.
-We prefer to use a BDD approach, where you break down all interaction logic into simple actions and create
-one "step" method per action as it's implementation. This is where all the extension methods from ExtendedWebElement
+After you have described web pages, it's time to start organizing the logic of working with them.
+We prefer to use a BDD approach, where you break down all the interaction logic into simple actions and create
+one "step" method per action as it's implementation. That is where all the extension methods from ExtendedWebElement
 and ExtendedList classes come in handy.
 
-We will use harmcrest matchers for conditioning
-[source, xml]
-----
-<dependency>
-   <groupId>org.hamcrest</groupId>
-   <artifactId>hamcrest-all</artifactId>
-   <version>1.3</version>
-</dependency>
-----
+We will use http://hamcrest.org/JavaHamcrest/javadoc/1.3/org/hamcrest/Matchers.html[harmcrest matchers] for conditioning
+
 
 === Working with elements
 *Waiting on a condition for a single element.*
@@ -65,7 +58,7 @@ To show how this idea works we made a `ScrollableElement` and an additional `hov
 ----
 
 `ScrollableElement` is just a very simple class introducing single `scrollToElement()` method.
-Annotation `@ScrollMethod` points to method's implementation.
+Annotation `@ScrollMethod` points to the method's implementation.
 [source, java]
 ----
 public interface ScrollableElement extends ExtendedWebElement {
@@ -85,7 +78,7 @@ public interface Footer extends ScrollableElement<Footer> {
 }
 ----
 
-Then you will be able to scroll to the actual footer of your page like this:
+Then you will be able to scroll to the actual footer of the page like this:
 [source, java]
 ----
 @Step("Start a chat with support")
@@ -93,8 +86,110 @@ Then you will be able to scroll to the actual footer of your page like this:
         onSearchPage().footer().scrollToElement();
         onSearchPage().footer().supportChatButton()
         .waitUntil(WebElement::isDisplayed) //waiting for scroll to finish before click
-        .click()
+        .click();
         return this;
     }
 ----
 
+=== Working with collections
+
+Collections of elements are meant to be indiscrete objects. Working with individual elements of a collection
+should generally be considered an anti-pattern, because elements behind the collection will not be refreshed
+on the subsequent calls, and their usage may lead to the `StaleElementReferenceException`.
+
+*Waiting and verifying collection state.* `ExtendedList` has the same `waitUntil()` and `should()` methods as were
+described above. Overall logic of their usage should be roughly the same, but with a little difference introduced by
+abilities to filter via `filter()` and to perform a mapping transformation via `convert()` methods.
+[source, java]
+----
+@Step("Check that search results contain exactly «{}»")
+    public SearchPageSteps checkSearchResults(List<String> expectedItems){
+        onSearchPage().resultsForm().usersFound()
+        .waitUntil(not(empty()) //waiting for elements to load
+        .convert(user -> user.name().getText()) //convert ExtendedWebElement to String
+        .should(containsInAnyOrder(expectedItems.toArray())); //assertion for a collection
+    }
+----
+
+*Filtering*
+[source, java]
+----
+@Step("Check active users contain exactly «{}»")
+    public SearchPageSteps checkActiveUsersFound(List<String> expectedUsers){
+        onSearchPage().resultsForm().usersFound()
+        .waitUntil(not(empty()) //waiting for elements to load
+        .filter(user -> user.getAttribute("class").contains("selected"))
+        .convert(user -> user.name().getText()) //convert ExtendedWebElement to String
+        .should(containsInAnyOrder(expectedItems.toArray())); //assertion for a collection
+    }
+----
+
+Don't do this! Use a parameterized selector instead.
+[source, java]
+----
+@Step("Select filter checkbox «{}»")
+    public SearchPageSteps selectFilterCheckbox(String name){
+         onSearchPage().searchPanel().filtersTab().checkboxes()
+                        .waitUntil(not(empty()))
+                        .filter(chkbox -> chkbox.getText().contains(name))
+                        .get(0).click(); //don't do this
+    }
+----
+
+=== Working with pages
+`WebPage` interface has several methods to help working with pages
+
+*Define a base url for page.* If you annotate a `WebPage` with `@BaseUrl` you can specify an url to be opened
+when `WebPage` 's `go()` method is called.
+
+[source, java]
+----
+
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage {
+
+     //elements for search page here
+}
+----
+
+Then after instantiation you can call `go()` method like this:
+
+[source, java]
+----
+WebPageFactory factory = new WebPageFactory();
+SearchPage page = factory.get(driver, SearchPage.class);
+page.go()
+----
+
+*Waiting for page loading.* There is a special `isAt(Matcher<String> url)` that waits on the condition for page's
+current url and `document.readyState` flag.
+
+[source, java]
+----
+
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage {
+
+     @Description("Account button")
+     @FindBy("//div[@class = 'account-button']")
+     ExtendedWebElement accountButton();
+}
+
+@BaseUrl("http://www.base.url/account")
+public interface AccountPage extends WebPage {
+
+     //elements for account page here
+}
+----
+
+To navigate between this two pages you have to wait for the account page to load after click on 'Account' button.
+
+[source, java]
+----
+@Step("Go to the current account settings")
+public void openAccountSettings() {
+    onSearchPage().accountButton().click();
+    onAccountPage().isAt(equalTo("http://www.base.url/account"));
+    //continue working with account page
+}
+----
