@@ -1,20 +1,15 @@
 package io.qameta.htmlelements.extension;
 
-import com.google.common.base.Predicate;
 import io.qameta.htmlelements.context.Context;
-import io.qameta.htmlelements.exception.WebPageException;
 import org.hamcrest.Matcher;
-import org.openqa.selenium.TimeoutException;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
-import static io.qameta.htmlelements.context.Store.DRIVER_KEY;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @Target(ElementType.METHOD)
@@ -27,22 +22,11 @@ public @interface ShouldMethod {
         @Override
         @SuppressWarnings("unchecked")
         public Object handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
+            System.out.println("Invoke should method: " + Arrays.toString(args));
             String message = (String) args[0];
             Matcher matcher = (Matcher) args[1];
 
-            WebDriver driver = context.getStore().get(DRIVER_KEY, WebDriver.class)
-                    .orElseThrow(() -> new WebPageException("WebDriver is missing"));
-
-            try {
-                new WebDriverWait(driver, 5)
-                        .ignoring(AssertionError.class)
-                        .until((Predicate<WebDriver>) (d) -> {
-                            assertThat(message, proxy, matcher);
-                            return true;
-                        });
-            } catch (TimeoutException e) {
-                throw e.getCause();
-            }
+            assertThat(message, proxy, matcher);
             return proxy;
         }
     }

@@ -1,6 +1,7 @@
 package io.qameta.htmlelements.element;
 
 import io.qameta.htmlelements.extension.HoverMethod;
+import io.qameta.htmlelements.extension.Retry;
 import io.qameta.htmlelements.extension.ShouldMethod;
 import io.qameta.htmlelements.extension.ToStringMethod;
 import io.qameta.htmlelements.extension.WaitUntilMethod;
@@ -12,12 +13,15 @@ import java.util.function.Predicate;
 
 public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
 
+    @Retry
     @WaitUntilMethod
     FluentType waitUntil(String description, Predicate<FluentType> predicate);
 
+    @Retry
     @ShouldMethod
     FluentType should(String message, Matcher matcher);
 
+    @Retry
     @HoverMethod
     FluentType hover();
 

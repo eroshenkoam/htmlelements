@@ -6,6 +6,8 @@ public interface Store {
 
     String DRIVER_KEY = "driver";
     String BASE_URL_KEY = "baseUrl";
+    String DESCRIPTION_KEY = "description";
+    String LISTENER_MANAGER_KEY = "listener";
 
     Optional<Object> get(Object key);
 

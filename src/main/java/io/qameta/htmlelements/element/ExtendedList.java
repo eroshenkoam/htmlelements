@@ -3,6 +3,7 @@ package io.qameta.htmlelements.element;
 import io.qameta.htmlelements.extension.ConvertMethod;
 import io.qameta.htmlelements.extension.DescriptionProvider;
 import io.qameta.htmlelements.extension.FilterMethod;
+import io.qameta.htmlelements.extension.Retry;
 import io.qameta.htmlelements.extension.SelectorProvider;
 import io.qameta.htmlelements.extension.ShouldMethod;
 import io.qameta.htmlelements.extension.ToStringMethod;
@@ -27,9 +28,11 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
     @ConvertMethod
     <R> ExtendedList<R> convert(Function<ItemType, R> function);
 
+    @Retry
     @ShouldMethod
     ExtendedList<ItemType> should(String message, Matcher matcher);
 
+    @Retry
     @WaitUntilMethod
     ExtendedList<ItemType> waitUntil(String message, Predicate<ExtendedList<ItemType>> predicate);
 
