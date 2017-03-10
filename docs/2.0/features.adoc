@@ -1,7 +1,7 @@
 == Features
 After you have described web pages, it's time to start organizing the logic of working with them.
 We prefer to use a BDD approach, where you break down all the interaction logic into simple actions and create
-one "step" method per action as it's implementation. That is where all the extension methods from ExtendedWebElement
+one "step" method per action as its implementation. That is where all the extension methods from ExtendedWebElement
 and ExtendedList classes come in handy.
 
 We will use http://hamcrest.org/JavaHamcrest/javadoc/1.3/org/hamcrest/Matchers.html[harmcrest matchers] for conditioning
@@ -161,7 +161,7 @@ SearchPage page = factory.get(driver, SearchPage.class);
 page.go()
 ----
 
-*Waiting for page loading.* There is a special `isAt(Matcher<String> url)` that waits on the condition for page's
+*Waiting for page loading.* There is a special `isAt(Matcher<String> url)` method that waits on the condition for page's
 current url and `document.readyState` flag.
 
 [source, java]
@@ -182,7 +182,7 @@ public interface AccountPage extends WebPage {
 }
 ----
 
-To navigate between this two pages you have to wait for the account page to load after click on 'Account' button.
+To navigate between this two pages you have to wait for the account page to load after clicking on the 'Account' button.
 
 [source, java]
 ----

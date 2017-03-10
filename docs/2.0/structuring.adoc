@@ -1,10 +1,21 @@
 == Structuring Page Objects
 
-[cols="2",frame="none"]
-|=========================================================
+=== Defining a page
 
-a|
-1) Defining a page: pages are top-classes and they may contain elements or whole element blocks.
+Pages usually contain some high-level element blocks:
+
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+<form class='search2 suggest2-form'>...</form>
+...
+</body>
+----
+
+We will neatly organize a page object representation for them via a composition.
+Pages will be top-classes and they may contain elements or whole element blocks.
+
 [source, java]
 ----
 @BaseUrl("http://www.base.url/search")
@@ -20,30 +31,9 @@ public interface SearchPage extends WebPage {
   UserTooltip userTooltip();
 }
 ----
-a|
-Web pages usually contain some high-level blocks, that we will neatly organize via a composition
-[source, html]
-----
-<body>
-<div class='toolbar'>...</div>
-<form class='search2 suggest2-form'>...</form>
-...
-</body>
-----
-a|
-2) Organizing a block of web elements on the page: you need to extend an interface from ExtendedWebElement
-and you are good to go
-[source, java]
-----
-public interface Toolbar extends ExtendedWebElement<Toolbar>{
 
-    @FindBy(".//span[@class = 'status-text']")
-    ExtendedWebElement statusText();
-}
-----
-a|
-Your classes for such blocks of elements can contain sub-blocks, or once you've reached a singular element,
- use the ExtendedWebElement as it's type.
+=== Organizing a block of web elements on the page
+
 [source, html]
 ----
 <body>
@@ -55,21 +45,26 @@ Your classes for such blocks of elements can contain sub-blocks, or once you've 
 ...
 </body>
 ----
-a|
-3) You can define a collection of elements for a page or for a block
-[source, java]
-----
-public interface Toolbar extends ExtendedWebElement<Toolbar>{
 
-    @FindBy(".//button[@class = 'action-button']")
-    ExtendedList<ToolbarButton> buttons();
+To describe a toolbar block you need to extend an interface from `ExtendedWebElement` and you are good to go:
+
+[source, java]
+-----------------------------------
+public interface Toolbar extends ExtendedWebElement<Toolbar>{
 
     @FindBy(".//span[@class = 'status-text']")
     ExtendedWebElement statusText();
 }
-----
-a|
-Button elements have a specific ToolbarButton class to represent them.
+-----------------------------------
+
+Your classes for such blocks of elements can contain sub-blocks, or once you've reached a singular element,
+ use the `ExtendedWebElement` as its type.
+
+
+=== Collections of elements
+
+You can define a collection of elements for a page or for a block
+
 [source, html]
 ----
 <body>
@@ -90,26 +85,25 @@ Button elements have a specific ToolbarButton class to represent them.
 ...
 </body>
 ----
-a|
-4) You can use parameterized selectors to simplify your work with homogeneous elements
+
+Button elements have a specific ToolbarButton class to represent them:
+
 [source, java]
 ----
-public interface SearchResultsPanel extends ExtendedWebElement<SearchResultsForm> {
+public interface Toolbar extends ExtendedWebElement<Toolbar>{
 
-    @Description("Search result for user {{userName}}")
-    @FindBy(".//div[contains(@class, 'search-result-item') and contains(., {{userName}}]")
-    UserResult user(@Param("userName") String userName);
+    @FindBy(".//button[@class = 'action-button']")
+    ExtendedList<ToolbarButton> buttons();
+
+    @FindBy(".//span[@class = 'status-text']")
+    ExtendedWebElement statusText();
 }
 ----
 
-Invocation of parameterized method:
-[source, java]
-----
-UserResult foundUser = searchPage.resultsPanel().user("User 1");
-----
-a|
-Here parameterized element will match a block of elements for User 1 from search results. Parameters can be used with
-collections of elements as well.
+=== Parameterized selectors
+
+To work with homogeneous elements you can parameterize a selector:
+
 [source, html]
 ----
 <body>
@@ -128,31 +122,30 @@ collections of elements as well.
 ...
 </body>
 ----
-a|
-5) Very often you will have some identical html blocks across different pages, e.g. toolbars, footers, dropdowns,
- pickers e.t.c. Once you wrote a class describing such a block, it can be easily reused across all of the pages:
+
 [source, java]
 ----
+public interface SearchResultsPanel extends ExtendedWebElement<SearchResultsForm> {
 
-@BaseUrl("http://www.base.url/search")
-public interface SearchPage extends WebPage, WithToolbar<SearchPage> {
-
-     //other elements for search page here
-}
-
-@BaseUrl("http://www.base.url/account")
-public interface AccountPage extends WebPage, WithToolbar<AccountPage> {
-
-     //other elements for account page here
-}
-
-public interface WithToolbar<T> extends ExtendedWebElement<T>{
-
-   @FindBy("//div[@class='toolbar']")
-   Toolbar toolbar();
+    @Description("Search result for user {{userName}}")
+    @FindBy(".//div[contains(@class, 'search-result-item') and contains(., {{userName}}]")
+    UserResult user(@Param("userName") String userName);
 }
 ----
-a|
+
+Invocation of parameterized method:
+
+[source, java]
+----
+UserResult foundUser = searchPage.resultsPanel().user("User 1");
+----
+Here parameterized element will match a block of elements for `User 1` from search results. Parameters can be used with collections of elements as well.
+
+=== Reusing blocks
+
+Very often you will have some identical html blocks across different pages, e.g. toolbars, footers, dropdowns,
+ pickers e.t.c.
+
 First page - base.url/search:
 [source, html]
 ----
@@ -171,5 +164,28 @@ Second page - base.url/account:
 </body>
 ----
 
-both pages have a toolbar block, represented by the Toolbar class.
-|=========================================================
+both pages have a toolbar block, represented by the `Toolbar` class.
+
+Once you wrote a class describing such a block, it can be easily reused across all of the pages:
+
+[source, java]
+----
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage, WithToolbar<SearchPage> {
+
+     //other elements for search page here
+}
+
+@BaseUrl("http://www.base.url/account")
+public interface AccountPage extends WebPage, WithToolbar<AccountPage> {
+
+     //other elements for account page here
+}
+
+public interface WithToolbar<T> extends ExtendedWebElement<T>{
+
+   @FindBy("//div[@class='toolbar']")
+   Toolbar toolbar();
+}
+----
+
