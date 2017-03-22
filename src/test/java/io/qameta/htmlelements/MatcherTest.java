@@ -33,7 +33,7 @@ public class MatcherTest {
                 .should(displayed());
 
         searchPage.searchArrow()
-                .waitUntil(hasText("search-arrow"));
+                .waitUntil("", hasText("search-arrow"), 10);
 
         searchPage.searchArrow().suggest()
                 .convert(SuggestItem::title)
