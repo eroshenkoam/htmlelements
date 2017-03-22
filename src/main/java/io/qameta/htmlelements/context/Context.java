@@ -3,9 +3,14 @@ package io.qameta.htmlelements.context;
 import io.qameta.htmlelements.extension.ExtensionRegistry;
 import org.openqa.selenium.WebDriver;
 
+import java.util.List;
 import java.util.Optional;
 
 public class Context {
+
+    public static final String LISTENERS_KEY = "listeners";
+
+    public static final String DRIVER_KEY = "driver";
 
     private Context parent;
 
@@ -42,8 +47,11 @@ public class Context {
         childContext.setRegistry(ExtensionRegistry.create(proxyClass));
         childContext.setParent(this);
         //extension
-        getStore().get("driver", WebDriver.class).ifPresent(driver -> {
-            childContext.getStore().put("driver", driver);
+        getStore().get(LISTENERS_KEY, List.class).ifPresent(listeners -> {
+            childContext.getStore().put(LISTENERS_KEY, listeners);
+        });
+        getStore().get(DRIVER_KEY, WebDriver.class).ifPresent(driver -> {
+            childContext.getStore().put(DRIVER_KEY, driver);
         });
         return childContext;
     }

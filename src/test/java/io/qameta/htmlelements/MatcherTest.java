@@ -1,6 +1,7 @@
 package io.qameta.htmlelements;
 
 import io.qameta.htmlelements.example.element.SuggestItem;
+import io.qameta.htmlelements.statement.Listener;
 import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
@@ -8,8 +9,11 @@ import org.junit.Test;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
 
+import java.lang.reflect.Method;
+
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
 
 public class MatcherTest {
@@ -19,7 +23,13 @@ public class MatcherTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testOutput() throws Exception {
-        WebPageFactory pageObjectFactory = new WebPageFactory();
+        WebPageFactory pageObjectFactory = new WebPageFactory()
+                .listener(new Listener() {
+                    @Override
+                    public void beforeMethodCall(Method method, Object[] args) {
+                        System.out.println(format("%s [%s]", method.getName(), args));
+                    }
+                });
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
 

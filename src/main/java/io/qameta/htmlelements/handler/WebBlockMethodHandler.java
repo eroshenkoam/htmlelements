@@ -8,12 +8,15 @@ import io.qameta.htmlelements.extension.MethodParameters;
 import io.qameta.htmlelements.extension.Retry;
 import io.qameta.htmlelements.extension.TargetModifier;
 import io.qameta.htmlelements.extension.Timeout;
+import io.qameta.htmlelements.statement.ListenerStatement;
 import io.qameta.htmlelements.statement.RetryStatement;
 import io.qameta.htmlelements.statement.Statement;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -60,9 +63,17 @@ public class WebBlockMethodHandler implements InvocationHandler {
             base = () -> handler.handle(getContext(), proxy, method, args);
         }
 
+        ListenerStatement statement = prepareListenerStatement(method, args);
         RetryStatement retry = prepareRetryStatement(method, args);
 
-        return retry.apply(base).evaluate();
+        return statement.apply(retry.apply(base)).evaluate();
+    }
+
+    @SuppressWarnings("unchecked")
+    private ListenerStatement prepareListenerStatement(Method method, Object[] args) {
+        ListenerStatement statement = new ListenerStatement(method, args);
+        getContext().getStore().get(Context.LISTENERS_KEY, List.class).ifPresent(statement::withListeners);
+        return statement;
     }
 
     private RetryStatement prepareRetryStatement(Method method, Object[] args) {

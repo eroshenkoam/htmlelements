@@ -24,7 +24,6 @@ public @interface WaitUntilMethod {
         public Object handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {
             String message = (String) args[0];
             Matcher matcher = (Matcher) args[1];
-            System.out.println(matcher);
             if (!matcher.matches(proxy)) {
                 StringDescription description = new StringDescription();
                 description.appendText(message).appendText("\nExpected: ").appendDescriptionOf(matcher).appendText("\n     but: ");
