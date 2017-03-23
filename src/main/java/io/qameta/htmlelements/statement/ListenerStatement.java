@@ -9,7 +9,7 @@ import java.util.*;
  */
 public class ListenerStatement implements StatementWrapper {
 
-    private final Object proxy;
+    private final String description;
 
     private final Method method;
 
@@ -17,10 +17,10 @@ public class ListenerStatement implements StatementWrapper {
 
     private List<Listener> listeners;
 
-    public ListenerStatement(Object proxy, Method method, Object[] args) {
+    public ListenerStatement(String description, Method method, Object[] args) {
         this.listeners = new ArrayList<>();
+        this.description = description;
         this.method = method;
-        this.proxy = proxy;
         this.args = args;
     }
 
@@ -33,13 +33,13 @@ public class ListenerStatement implements StatementWrapper {
     public Statement apply(Statement statement) throws Throwable {
         return () -> {
             try {
-                listeners.forEach(listener -> listener.beforeMethodCall(proxy, method, args));
+                listeners.forEach(listener -> listener.beforeMethodCall(description, method, args));
                 return statement.evaluate();
             } catch (Throwable exception) {
-                listeners.forEach(listener -> listener.onMethodFailed(proxy, method, exception));
+                listeners.forEach(listener -> listener.onMethodFailed(description, method, exception));
                 throw exception;
             } finally {
-                listeners.forEach(listener -> listener.afterMethodCall(proxy, method));
+                listeners.forEach(listener -> listener.afterMethodCall(description, method));
             }
         };
     }

@@ -1,5 +1,6 @@
 package io.qameta.htmlelements.example.element;
 
+import io.qameta.htmlelements.annotation.Description;
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.element.ExtendedList;
 import io.qameta.htmlelements.element.ExtendedWebElement;
@@ -14,6 +15,7 @@ import java.util.List;
  */
 public interface WithSuggest<T> extends ExtendedWebElement<T> {
 
+    @Description("Список саджестов")
     @FindBy(TestData.SUGGEST_XPATH)
     ExtendedList<SuggestItem> suggest();
 

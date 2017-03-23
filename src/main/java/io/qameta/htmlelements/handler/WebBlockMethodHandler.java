@@ -63,15 +63,17 @@ public class WebBlockMethodHandler implements InvocationHandler {
             base = () -> handler.handle(getContext(), proxy, method, args);
         }
 
-        ListenerStatement statement = prepareListenerStatement(proxy, method, args);
+
+        ListenerStatement statement = prepareListenerStatement(method, args);
         RetryStatement retry = prepareRetryStatement(method, args);
 
         return statement.apply(retry.apply(base)).evaluate();
     }
 
     @SuppressWarnings("unchecked")
-    private ListenerStatement prepareListenerStatement(Object proxy, Method method, Object[] args) {
-        ListenerStatement statement = new ListenerStatement(proxy, method, args);
+    private ListenerStatement prepareListenerStatement(Method method, Object[] args) {
+        String description = getContext().getStore().get(Context.DESCRIPTION_KEY, String.class).get();
+        ListenerStatement statement = new ListenerStatement(description, method, args);
         getContext().getStore().get(Context.LISTENERS_KEY, List.class).ifPresent(statement::withListeners);
         return statement;
     }

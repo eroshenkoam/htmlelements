@@ -26,14 +26,15 @@ public class MatcherTest {
         WebPageFactory pageObjectFactory = new WebPageFactory()
                 .listener(new Listener() {
                     @Override
-                    public void beforeMethodCall(Method method, Object[] args) {
-                        System.out.println(format("%s [%s]", method.getName(), args));
+                    public void beforeMethodCall(String description, Method method, Object[] args) {
+                        System.out.println(format("%s %s [%s]", description, method.getName(), args));
                     }
                 });
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
+        System.out.println(searchPage.toString());
 
-        System.out.println(searchPage.searchArrow().toString());
+        System.out.println(searchPage.searchArrow().form("form").toString());
 
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)

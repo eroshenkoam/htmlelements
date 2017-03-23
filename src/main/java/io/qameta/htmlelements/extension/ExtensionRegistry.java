@@ -1,5 +1,6 @@
 package io.qameta.htmlelements.extension;
 
+import io.qameta.htmlelements.annotation.Description;
 import io.qameta.htmlelements.util.ReflectionUtils;
 
 import java.lang.reflect.AnnotatedElement;
@@ -46,6 +47,13 @@ public class ExtensionRegistry {
 
     public void registerExtension(Class<? extends Extension> extensionType) {
         getExtensions().putIfAbsent(extensionType, ReflectionUtils.newInstance(extensionType));
+    }
+
+    public void registerExtensions(AnnotatedElement element) {
+        Arrays.stream(element.getAnnotations())
+                .filter(annotation -> annotation.annotationType().isAnnotationPresent(ExtendWith.class))
+                .map(annotation -> annotation.annotationType().getAnnotation(ExtendWith.class).value())
+                .forEach(this::registerExtension);
     }
 
     private Map<Class<? extends Extension>, Extension> getExtensions() {

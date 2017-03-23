@@ -8,13 +8,13 @@ import java.lang.reflect.Method;
  */
 public interface Listener {
 
-    default void beforeMethodCall(Object proxy, Method method, Object[] args) {
+    default void beforeMethodCall(String description, Method method, Object[] args) {
     }
 
-    default void onMethodFailed(Object proxy, Method method, Throwable exception) {
+    default void onMethodFailed(String description, Method method, Throwable exception) {
     }
 
-    default void afterMethodCall(Object proxy, Method method) {
+    default void afterMethodCall(String description, Method method) {
     }
 
 }
