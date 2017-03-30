@@ -15,6 +15,7 @@ import io.qameta.htmlelements.statement.Statement;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -63,11 +64,14 @@ public class WebBlockMethodHandler implements InvocationHandler {
             base = () -> handler.handle(getContext(), proxy, method, args);
         }
 
-
         ListenerStatement statement = prepareListenerStatement(method, args);
         RetryStatement retry = prepareRetryStatement(method, args);
 
-        return statement.apply(retry.apply(base)).evaluate();
+        try {
+            return statement.apply(retry.apply(base)).evaluate();
+        } catch (MethodInvocationException e) {
+            throw e.getCause();
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -96,12 +100,12 @@ public class WebBlockMethodHandler implements InvocationHandler {
     }
 
     @SuppressWarnings("unchecked")
-    private Object safeInvokeTargetMethod(Supplier targetProvider, Method method, Object[] args) {
-        Object target = targetProvider.get();
-        for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
-            target = modifier.modify(getContext(), target);
-        }
+    private Object safeInvokeTargetMethod(Supplier targetProvider, Method method, Object[] args) throws Throwable {
         try {
+            Object target = targetProvider.get();
+            for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
+                target = modifier.modify(getContext(), target);
+            }
             return method.invoke(target, args);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new MethodInvocationException(e);
