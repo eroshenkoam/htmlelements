@@ -84,7 +84,6 @@ public class ReflectionUtils {
             return locator;
 
         };
-
         By by= null;
         String locator;
         FindBy findBy=method.getAnnotation(FindBy.class);
