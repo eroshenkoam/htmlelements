@@ -11,6 +11,6 @@ import io.qameta.htmlelements.extension.page.BaseUrl;
 @BaseUrl("https://en.wikipedia.org/wiki/Main_Page")
 public interface WikiMainPage extends WebPage {
 
-    @FindBy("//a[.='Complete list of Wikipedias']")
+    @FindBy(xpath = "//a[.='Complete list of Wikipedias']")
     ScrollableElement wikiList();
 }

@@ -7,7 +7,7 @@ import io.qameta.htmlelements.example.TestData;
 
 public interface SuggestItem extends ExtendedWebElement<SuggestItem>{
 
-    @FindBy(TestData.SUGGEST_ITEM_XPATH)
+    @FindBy(xpath = TestData.SUGGEST_ITEM_XPATH)
     HtmlElement title();
 
 }

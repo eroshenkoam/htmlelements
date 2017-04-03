@@ -16,7 +16,7 @@ import java.util.List;
 public interface WithSuggest<T> extends ExtendedWebElement<T> {
 
     @Description("Список саджестов")
-    @FindBy(TestData.SUGGEST_XPATH)
+    @FindBy(xpath = TestData.SUGGEST_XPATH)
     ExtendedList<SuggestItem> suggest();
 
 }

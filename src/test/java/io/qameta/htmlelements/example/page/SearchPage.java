@@ -14,7 +14,7 @@ import io.qameta.htmlelements.extension.page.BaseUrl;
 public interface SearchPage extends WebPage {
 
     @Description("Поисковая строка")
-    @FindBy(TestData.SEARCH_ARROW_XPATH)
+    @FindBy(xpath = TestData.SEARCH_ARROW_XPATH)
     SearchArrow searchArrow();
 
 }
