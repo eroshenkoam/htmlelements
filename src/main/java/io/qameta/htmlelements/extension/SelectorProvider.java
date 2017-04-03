@@ -2,6 +2,8 @@ package io.qameta.htmlelements.extension;
 
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.context.Context;
+import io.qameta.htmlelements.util.ReflectionUtils;
+import org.openqa.selenium.By;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,8 +24,8 @@ public @interface SelectorProvider {
 
         @Override
         public void enrich(Context context, Method method, Object[] args) {
-            String selector = method.getAnnotation(FindBy.class).value();
-            context.getStore().put(SELECTOR_KEY, selector);
+            By selector = ReflectionUtils.getSelector(method, args);
+            context.getStore().put(SELECTOR_KEY, selector.toString());
         }
 
         @Override

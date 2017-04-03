@@ -29,7 +29,9 @@ import static java.util.stream.Collectors.toList;
 @HandleWith(FindBy.Extension.class)
 public @interface FindBy {
 
-    String value();
+    String xpath() default "";
+    String css() default "";
+    String id() default "";
 
     class Extension implements MethodHandler<Object> {
 
@@ -39,7 +41,7 @@ public @interface FindBy {
 
             // html element proxy (recurse)
             if (method.isAnnotationPresent(FindBy.class) && WebElement.class.isAssignableFrom(proxyClass)) {
-                String selector = ReflectionUtils.getSelector(method, args);
+                By selector = ReflectionUtils.getSelector(method, args);
 
                 Context childContext = context.newChildContext(method, method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)
@@ -47,14 +49,14 @@ public @interface FindBy {
                 return createProxy(
                         method.getReturnType(),
                         childContext,
-                        () -> ((SearchContext) proxy).findElement(By.xpath(selector)),
+                        () -> ((SearchContext) proxy).findElement(selector),
                         WebElement.class, Locatable.class
                 );
             }
 
             // html element list proxy (recurse)
             if (method.isAnnotationPresent(FindBy.class) && List.class.isAssignableFrom(method.getReturnType())) {
-                String selector = ReflectionUtils.getSelector(method, args);
+                By selector = ReflectionUtils.getSelector(method, args);
 
                 Context childContext = context.newChildContext(method, method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)
@@ -63,7 +65,7 @@ public @interface FindBy {
                         method.getReturnType(),
                         childContext,
                         () -> {
-                            List<WebElement> originalElements = ((SearchContext) proxy).findElements(By.xpath(selector));
+                            List<WebElement> originalElements = ((SearchContext) proxy).findElements(selector);
                             Type methodReturnType = ((ParameterizedType) method
                                     .getGenericReturnType()).getActualTypeArguments()[0];
                             return (List) originalElements.stream()
