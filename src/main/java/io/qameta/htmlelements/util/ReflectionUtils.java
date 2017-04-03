@@ -79,7 +79,7 @@ public class ReflectionUtils {
         Function<String,String> replaceParam= locator->{
             Map<String, String> parameters = getParameters(method, args);
             for (String key : parameters.keySet()) {
-                locator = locator.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+                locator = locator.replaceAll("\\{\\{" + key + "\\}\\}", parameters.get(key));
             }
             return locator;
 
@@ -121,7 +121,7 @@ public class ReflectionUtils {
             Map<String, String> parameters = getParameters(method, args);
             String name = method.getAnnotation(Description.class).value();
             for (String key : parameters.keySet()) {
-                name = name.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+                name = name.replaceAll("\\{\\{" + key + "\\}\\}", parameters.get(key));
             }
             return name;
         } else {
