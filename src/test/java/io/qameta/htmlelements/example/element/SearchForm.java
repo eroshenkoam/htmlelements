@@ -11,7 +11,7 @@ import org.openqa.selenium.WebElement;
  */
 public interface SearchForm extends ExtendedWebElement<SearchForm> {
 
-    @FindBy(xpath = TestData.REQUEST_INPUT_XPATH)
+    @FindBy(css = TestData.REQUEST_INPUT_XPATH)
     WebElement input();
 
 }
