@@ -29,6 +29,7 @@ import static java.util.stream.Collectors.toList;
 @HandleWith(FindBy.Extension.class)
 public @interface FindBy {
 
+    String value() default "";
     String xpath() default "";
     String css() default "";
     String id() default "";

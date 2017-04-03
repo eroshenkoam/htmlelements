@@ -88,6 +88,13 @@ public class ReflectionUtils {
         String locator;
         FindBy findBy=method.getAnnotation(FindBy.class);
         List<String> locators = new ArrayList<>();
+        //default xpath
+        if(!findBy.value().isEmpty()) {
+            locator=replaceParam.apply(findBy.value());
+            by = By.xpath(locator);
+            locators.add(locator);
+        }
+
         //xpath
         if(!findBy.xpath().isEmpty()) {
             locator=replaceParam.apply(findBy.xpath());
