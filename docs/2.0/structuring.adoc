@@ -1,0 +1,175 @@
+== Structuring Page Objects
+
+[cols="2",frame="none"]
+|=========================================================
+
+a|
+1) Defining a page: pages are top-classes and they may contain elements or whole element blocks.
+[source, java]
+----
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage {
+
+  @FindBy("//form[contains(@class, 'search2 suggest2-form')]")
+  SearchArrow searchArrow();
+
+  @FindBy("//div[@class='toolbar']")
+  Toolbar toolbar();
+
+  @FindBy("//div[@class='user-tooltip']")
+  UserTooltip userTooltip();
+}
+----
+a|
+Web pages usually contain some high-level blocks, that we will neatly organize via a composition
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+<form class='search2 suggest2-form'>...</form>
+...
+</body>
+----
+a|
+2) Organizing a block of web elements on the page: you need to extend an interface from ExtendedWebElement
+and you are good to go
+[source, java]
+----
+public interface Toolbar extends ExtendedWebElement<Toolbar>{
+
+    @FindBy(".//span[@class = 'status-text']")
+    ExtendedWebElement statusText();
+}
+----
+a|
+Your classes for such blocks of elements can contain sub-blocks, or once you've reached a singular element,
+ use the ExtendedWebElement as it's type.
+[source, html]
+----
+<body>
+<div class='toolbar'>
+  <span class='status-text'> Status </span>
+  ...
+</div>
+<form class='search2 suggest2-form'>...</form>
+...
+</body>
+----
+a|
+3) You can define a collection of elements for a page or for a block
+[source, java]
+----
+public interface Toolbar extends ExtendedWebElement<Toolbar>{
+
+    @FindBy(".//button[@class = 'action-button']")
+    ExtendedList<ToolbarButton> buttons();
+
+    @FindBy(".//span[@class = 'status-text']")
+    ExtendedWebElement statusText();
+}
+----
+a|
+Button elements have a specific ToolbarButton class to represent them.
+[source, html]
+----
+<body>
+<div class='toolbar'>
+   <span class='status-text'> Status
+   </span>
+   <button class='action-button'>
+      <img src='//button-1-icon.png'>
+      ...
+   </button>
+   <button class='action-button'>
+      <img src='//button-2-icon.png'>
+      ...
+   </button>
+   ...
+</div>
+<form class='search2 suggest2-form'>...</form>
+...
+</body>
+----
+a|
+4) You can use parameterized selectors to simplify your work with homogeneous elements
+[source, java]
+----
+public interface SearchResultsPanel extends ExtendedWebElement<SearchResultsForm> {
+
+    @Description("Search result for user {{userName}}")
+    @FindBy(".//div[contains(@class, 'search-result-item') and contains(., {{userName}}]")
+    UserResult user(@Param("userName") String userName);
+}
+----
+
+Invocation of parameterized method:
+[source, java]
+----
+UserResult foundUser = searchPage.resultsPanel().user("User 1");
+----
+a|
+Here parameterized element will match a block of elements for User 1 from search results. Parameters can be used with
+collections of elements as well.
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+<form class='search2 suggest2-form'>...</form>
+<div class='search-results'>
+   <div class = 'search-result-item search-result-user'>
+      <span>User 1</span>
+      ...
+   </div>
+   <div class = 'search-result-item search-result-task'>
+         <span>Task 1</span>
+         ...
+   </div>
+</div>
+...
+</body>
+----
+a|
+5) Very often you will have some identical html blocks across different pages, e.g. toolbars, footers, dropdowns,
+ pickers e.t.c. Once you wrote a class describing such a block, it can be easily reused across all of the pages:
+[source, java]
+----
+
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage, WithToolbar<SearchPage> {
+
+     //other elements for search page here
+}
+
+@BaseUrl("http://www.base.url/account")
+public interface AccountPage extends WebPage, WithToolbar<AccountPage> {
+
+     //other elements for account page here
+}
+
+public interface WithToolbar<T> extends ExtendedWebElement<T>{
+
+   @FindBy("//div[@class='toolbar']")
+   Toolbar toolbar();
+}
+----
+a|
+First page - base.url/search:
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+...
+</body>
+----
+
+Second page - base.url/account:
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+...
+</body>
+----
+
+both pages have a toolbar block, represented by the Toolbar class.
+|=========================================================

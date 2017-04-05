@@ -5,8 +5,10 @@ import io.qameta.htmlelements.extension.DescriptionProvider;
 import io.qameta.htmlelements.extension.FilterMethod;
 import io.qameta.htmlelements.extension.SelectorProvider;
 import io.qameta.htmlelements.extension.ShouldMethod;
+import io.qameta.htmlelements.extension.Timeout;
 import io.qameta.htmlelements.extension.ToStringMethod;
 import io.qameta.htmlelements.extension.WaitUntilMethod;
+import io.qameta.htmlelements.matcher.PredicateMatcher;
 import org.hamcrest.Matcher;
 
 import java.util.List;
@@ -21,41 +23,46 @@ public interface ExtendedList<ItemType> extends List<ItemType> {
     @DescriptionProvider
     String getDescription();
 
-    @FilterMethod
-    ExtendedList<ItemType> filter(Predicate<ItemType> predicate);
-
     @ConvertMethod
     <R> ExtendedList<R> convert(Function<ItemType, R> function);
 
-    @ShouldMethod
-    ExtendedList<ItemType> should(String message, Matcher matcher);
-
-    @WaitUntilMethod
-    ExtendedList<ItemType> waitUntil(String message, Predicate<ExtendedList<ItemType>> predicate);
-
-    @ToStringMethod
-    String toString();
-
-    default ExtendedList<ItemType> filter(String description, Predicate<ItemType> predicate) {
-        return filter(predicate);
-    }
+    @FilterMethod
+    ExtendedList<ItemType> filter(Predicate<ItemType> predicate);
 
     default ExtendedList<ItemType> filter(Matcher matcher) {
         return filter(matcher::matches);
     }
 
+    default ExtendedList<ItemType> filter(String description, Predicate<ItemType> predicate) {
+        return filter(predicate);
+    }
 
-    default ExtendedList<ItemType> should(Matcher matcher) {
-        return should("", matcher);
+    @WaitUntilMethod
+    ExtendedList<ItemType> waitUntil(String message, Matcher matcher);
+
+    @WaitUntilMethod
+    ExtendedList<ItemType> waitUntil(String message, Matcher matcher, @Timeout long timeout);
+
+    default ExtendedList<ItemType> waitUntil(Matcher matcher) {
+        return waitUntil("", matcher);
+    }
+
+    default ExtendedList<ItemType> waitUntil(String message, Predicate<ExtendedList<ItemType>> predicate) {
+        return waitUntil(message, new PredicateMatcher<>(predicate));
     }
 
     default ExtendedList<ItemType> waitUntil(Predicate<ExtendedList<ItemType>> predicate) {
         return waitUntil("", predicate);
     }
 
-    default ExtendedList<ItemType> waitUntil(Matcher matcher) {
-        return waitUntil(matcher.toString(), matcher::matches);
+    @ShouldMethod
+    ExtendedList<ItemType> should(String message, Matcher matcher);
+
+    default ExtendedList<ItemType> should(Matcher matcher) {
+        return should("", matcher);
     }
 
+    @ToStringMethod
+    String toString();
 
 }

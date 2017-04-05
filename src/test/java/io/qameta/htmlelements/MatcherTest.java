@@ -1,5 +1,8 @@
 package io.qameta.htmlelements;
 
+import io.qameta.htmlelements.example.element.SuggestItem;
+import io.qameta.htmlelements.statement.Listener;
+import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.element.SuggestItem;
 import io.qameta.htmlelements.example.page.SearchPage;
@@ -7,9 +10,12 @@ import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
+import java.lang.reflect.Method;
+
 import static io.qameta.htmlelements.matcher.DisplayedMatcher.displayed;
 import static io.qameta.htmlelements.matcher.HasAttributeMatcher.hasClass;
 import static io.qameta.htmlelements.matcher.HasTextMatcher.hasText;
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
 
 public class MatcherTest {
@@ -19,11 +25,18 @@ public class MatcherTest {
     @Test
     @SuppressWarnings("unchecked")
     public void testOutput() throws Exception {
-        WebPageFactory pageObjectFactory = new WebPageFactory();
+        WebPageFactory pageObjectFactory = new WebPageFactory()
+                .listener(new Listener() {
+                    @Override
+                    public void beforeMethodCall(String description, Method method, Object[] args) {
+                        System.out.println(format("%s %s [%s]", description, method.getName(), args));
+                    }
+                });
 
         SearchPage searchPage = pageObjectFactory.get(driver, SearchPage.class);
+        System.out.println(searchPage.toString());
 
-        System.out.println(searchPage.searchArrow().toString());
+        System.out.println(searchPage.searchArrow().form("form").toString());
 
         searchPage.searchArrow().suggest()
                 .filter(WebElement::isDisplayed)
@@ -39,7 +52,7 @@ public class MatcherTest {
                 .should(hasClass(containsString("search2_js_inited")));
 
         searchPage.searchArrow()
-                .waitUntil(hasText("search-arrow"));
+                .waitUntil("", hasText("search-arrow"), 10);
 
         searchPage.searchArrow().suggest()
                 .convert(SuggestItem::title)

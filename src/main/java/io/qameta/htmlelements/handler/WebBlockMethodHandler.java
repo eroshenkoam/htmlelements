@@ -3,12 +3,22 @@ package io.qameta.htmlelements.handler;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.MethodInvocationException;
 import io.qameta.htmlelements.exception.NotImplementedException;
+import io.qameta.htmlelements.extension.MethodHandler;
+import io.qameta.htmlelements.extension.MethodParameters;
+import io.qameta.htmlelements.extension.Retry;
 import io.qameta.htmlelements.extension.TargetModifier;
-import io.qameta.htmlelements.waiter.SlowLoadableComponent;
+import io.qameta.htmlelements.extension.Timeout;
+import io.qameta.htmlelements.statement.ListenerStatement;
+import io.qameta.htmlelements.statement.RetryStatement;
+import io.qameta.htmlelements.statement.Statement;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.UndeclaredThrowableException;
+import java.util.List;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
 import static io.qameta.htmlelements.util.ReflectionUtils.getMethodsNames;
@@ -44,33 +54,58 @@ public class WebBlockMethodHandler implements InvocationHandler {
 
         Class[] targetClass = getTargetClasses();
 
+        Statement base;
         // web element proxy
         if (getMethodsNames(targetClass, "equals", "hashCode").contains(method.getName())) {
-            return invokeTargetMethod(getTargetProvider(), method, args);
+            base = () -> safeInvokeTargetMethod(targetProvider, method, args);
+        } else {
+            MethodHandler handler = getContext().getRegistry().getHandler(method)
+                    .orElseThrow(() -> new NotImplementedException(method));
+            base = () -> handler.handle(getContext(), proxy, method, args);
         }
 
-        return getContext().getRegistry().getHandler(method)
-                .orElseThrow(() -> new NotImplementedException(method))
-                .handle(getContext(), proxy, method, args);
-    }
+        ListenerStatement statement = prepareListenerStatement(method, args);
+        RetryStatement retry = prepareRetryStatement(method, args);
 
-    @SuppressWarnings("unchecked")
-    private Object invokeTargetMethod(Supplier targetProvider, Method method, Object[] args)
-            throws Throwable {
         try {
-            return ((SlowLoadableComponent<Object>) () -> safeInvokeTargetMethod(targetProvider, method, args)).get();
-        } catch (MethodInvocationException e){
+            return statement.apply(retry.apply(base)).evaluate();
+        } catch (MethodInvocationException e) {
             throw e.getCause();
         }
     }
 
     @SuppressWarnings("unchecked")
-    private Object safeInvokeTargetMethod(Supplier targetProvider, Method method, Object[] args) {
-        Object target = targetProvider.get();
-        for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
-            target = modifier.modify(getContext(), target);
+    private ListenerStatement prepareListenerStatement(Method method, Object[] args) {
+        String description = getContext().getStore().get(Context.DESCRIPTION_KEY, String.class).get();
+        ListenerStatement statement = new ListenerStatement(description, method, args);
+        getContext().getStore().get(Context.LISTENERS_KEY, List.class).ifPresent(statement::withListeners);
+        return statement;
+    }
+
+    private RetryStatement prepareRetryStatement(Method method, Object[] args) {
+        RetryStatement retry = new RetryStatement()
+                .ignoring(Throwable.class);
+        if (method.isAnnotationPresent(Retry.class)) {
+            Retry retryAnnotation = method.getAnnotation(Retry.class);
+            retry.withTimeout(retryAnnotation.timeoutInSeconds(), TimeUnit.SECONDS)
+                    .pollingEvery(retryAnnotation.poolingInMillis(), TimeUnit.MILLISECONDS)
+                    .ignoring(retryAnnotation.ignoring());
         }
+
+        MethodParameters parameters = new MethodParameters(method, args);
+        parameters.getParameter(Timeout.class, Long.class)
+                .ifPresent(timeout -> retry.withTimeout(timeout, TimeUnit.SECONDS));
+
+        return retry;
+    }
+
+    @SuppressWarnings("unchecked")
+    private Object safeInvokeTargetMethod(Supplier targetProvider, Method method, Object[] args) throws Throwable {
         try {
+            Object target = targetProvider.get();
+            for (TargetModifier<Object> modifier : getContext().getRegistry().getExtensions(TargetModifier.class)) {
+                target = modifier.modify(getContext(), target);
+            }
             return method.invoke(target, args);
         } catch (InvocationTargetException | IllegalAccessException e) {
             throw new MethodInvocationException(e);

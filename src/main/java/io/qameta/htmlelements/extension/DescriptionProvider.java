@@ -12,17 +12,11 @@ import java.util.NoSuchElementException;
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
 @HandleWith(DescriptionProvider.Extension.class)
-@ExtendWith(DescriptionProvider.Extension.class)
 public @interface DescriptionProvider {
 
-    class Extension implements ContextEnricher, MethodHandler<String> {
+    class Extension implements MethodHandler<String> {
 
         private static final String DESCRIPTION_KEY = "description";
-
-        @Override
-        public void enrich(Context context, Method method, Object[] args) {
-            context.getStore().put(DESCRIPTION_KEY, method.getName());
-        }
 
         @Override
         public String handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {

@@ -41,7 +41,7 @@ public @interface FindBy {
             if (method.isAnnotationPresent(FindBy.class) && WebElement.class.isAssignableFrom(proxyClass)) {
                 String selector = ReflectionUtils.getSelector(method, args);
 
-                Context childContext = context.newChildContext(method.getReturnType());
+                Context childContext = context.newChildContext(method, method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)
                         .forEach(enricher -> enricher.enrich(childContext, method, args));
                 return createProxy(
@@ -56,7 +56,7 @@ public @interface FindBy {
             if (method.isAnnotationPresent(FindBy.class) && List.class.isAssignableFrom(method.getReturnType())) {
                 String selector = ReflectionUtils.getSelector(method, args);
 
-                Context childContext = context.newChildContext(method.getReturnType());
+                Context childContext = context.newChildContext(method, method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)
                         .forEach(enricher -> enricher.enrich(childContext, method, args));
                 return createProxy(
@@ -68,7 +68,7 @@ public @interface FindBy {
                                     .getGenericReturnType()).getActualTypeArguments()[0];
                             return (List) originalElements.stream()
                                     .map(element -> createProxy((Class<?>) methodReturnType,
-                                            childContext.newChildContext((Class<?>) methodReturnType),
+                                            childContext.newChildContext(method, (Class<?>) methodReturnType),
                                             () -> element,
                                             WebElement.class, Locatable.class))
                                     .collect(toList());
