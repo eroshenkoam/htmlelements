@@ -7,6 +7,7 @@ import io.qameta.htmlelements.annotation.Param;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
+import org.openqa.selenium.By;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -14,12 +15,16 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.stream;
 
 public class ReflectionUtils {
+
+    private static final int UNIQ_LOCATOR_COUNT = 1;
+
 
     public static <T> T newInstance(Class<T> clazz) {
         try {
@@ -70,13 +75,51 @@ public class ReflectionUtils {
         return splitCamelCase(clazz.getSimpleName());
     }
 
-    public static String getSelector(Method method, Object[] args) {
-        Map<String, String> parameters = getParameters(method, args);
-        String selector = method.getAnnotation(FindBy.class).value();
-        for (String key : parameters.keySet()) {
-            selector = selector.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+    public static By getSelector(Method method, Object[] args) {
+        Function<String,String> replaceParam= locator->{
+            Map<String, String> parameters = getParameters(method, args);
+            for (String key : parameters.keySet()) {
+                locator = locator.replaceAll("\\{\\{" + key + "\\}\\}", parameters.get(key));
+            }
+            return locator;
+
+        };
+        By by= null;
+        String locator;
+        FindBy findBy=method.getAnnotation(FindBy.class);
+        List<String> locators = new ArrayList<>();
+        //default xpath
+        if(!findBy.value().isEmpty()) {
+            locator=replaceParam.apply(findBy.value());
+            by = By.xpath(locator);
+            locators.add(locator);
         }
-        return selector;
+
+        //xpath
+        if(!findBy.xpath().isEmpty()) {
+            locator=replaceParam.apply(findBy.xpath());
+            by = By.xpath(locator);
+            locators.add(locator);
+        }
+        //css
+        if(!findBy.css().isEmpty()) {
+            locator=replaceParam.apply(findBy.css());
+            by = By.cssSelector(locator);
+            locators.add(locator);
+        }
+        //id
+        if(!findBy.id().isEmpty()) {
+            locator=replaceParam.apply(findBy.id());
+            by = By.id(locator);
+            locators.add(locator);
+        }
+
+        if (locators.size() != UNIQ_LOCATOR_COUNT) {
+            throw new IllegalArgumentException(
+                    String.format("You must specify at most one location strategy. Number found: %d (%s)",
+                            locators.size(), locators.toString()));
+        }
+        return by;
     }
 
     public static String getDescription(Method method, Object[] args) {
@@ -84,7 +127,7 @@ public class ReflectionUtils {
             Map<String, String> parameters = getParameters(method, args);
             String name = method.getAnnotation(Description.class).value();
             for (String key : parameters.keySet()) {
-                name = name.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+                name = name.replaceAll("\\{\\{" + key + "\\}\\}", parameters.get(key));
             }
             return name;
         } else {
