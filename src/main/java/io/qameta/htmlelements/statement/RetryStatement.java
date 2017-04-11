@@ -49,10 +49,12 @@ public class RetryStatement implements StatementWrapper {
         return () -> {
             Clock clock = new SystemClock();
             long end = clock.laterBy(timeout.in(TimeUnit.MILLISECONDS));
-            while ((clock.isNowBefore(end))) {
+            Throwable lastException;
+            do {
                 try {
                     return statement.evaluate();
                 } catch (Throwable e) {
+                    lastException = e;
                     if (ignoring.stream().anyMatch(clazz -> clazz.isInstance(e))) {
                         try {
                             Thread.sleep(polling.in(TimeUnit.MILLISECONDS));
@@ -63,8 +65,8 @@ public class RetryStatement implements StatementWrapper {
                         Throwables.propagate(e);
                     }
                 }
-            }
-            return statement.evaluate();
+            } while ((clock.isNowBefore(end)));
+            throw lastException;
         };
     }
 
