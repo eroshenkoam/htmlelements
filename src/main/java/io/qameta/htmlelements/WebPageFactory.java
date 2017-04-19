@@ -10,6 +10,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import static io.qameta.htmlelements.context.Context.newWebPageContext;
 
@@ -17,14 +18,22 @@ public class WebPageFactory {
 
     private final List<Listener> listeners = new ArrayList<>();
 
+    private final Properties properties = new Properties();
+
     public WebPageFactory listener(Listener listener) {
         this.listeners.add(listener);
+        return this;
+    }
+
+    public WebPageFactory property(String key, String value) {
+        properties.setProperty(key, value);
         return this;
     }
 
     public <T extends WebPage> T get(WebDriver driver, Class<T> pageObjectClass) {
         Context context = newWebPageContext(pageObjectClass, driver);
         context.getStore().put(Context.LISTENERS_KEY, listeners);
+        context.getStore().put(Context.PROPERTIES_KEY, properties);
         if (pageObjectClass.isAnnotationPresent(BaseUrl.class)) {
             context.getStore().put(Store.BASE_URL_KEY, pageObjectClass.getAnnotation(BaseUrl.class).value());
         }

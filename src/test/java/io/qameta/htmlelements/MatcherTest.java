@@ -24,6 +24,8 @@ public class MatcherTest {
     @SuppressWarnings("unchecked")
     public void testOutput() throws Exception {
         WebPageFactory pageObjectFactory = new WebPageFactory()
+                .property("retry.timeout", "2")
+                .property("retry.polling", "100")
                 .listener(new Listener() {
                     @Override
                     public void beforeMethodCall(String description, Method method, Object[] args) {

@@ -8,6 +8,7 @@ import org.openqa.selenium.support.ui.SystemClock;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -16,15 +17,19 @@ import java.util.concurrent.TimeUnit;
  */
 public class RetryStatement implements StatementWrapper {
 
+    public static final String TIMEOUT_KEY = "retry.timeout";
+
+    public static final String POLLING_KEY = "retry.polling";
+
     private Duration timeout;
 
     private Duration polling;
 
     private List<Class<? extends Throwable>> ignoring;
 
-    public RetryStatement() {
-        this.timeout = new Duration(5, TimeUnit.SECONDS);
-        this.polling = new Duration(250, TimeUnit.MILLISECONDS);
+    public RetryStatement(Properties properties) {
+        this.timeout = new Duration(Long.parseLong(properties.getProperty(TIMEOUT_KEY, "5")), TimeUnit.SECONDS);
+        this.polling = new Duration(Long.parseLong(properties.getProperty(POLLING_KEY, "250")), TimeUnit.MILLISECONDS);
         this.ignoring = new ArrayList<>();
     }
 

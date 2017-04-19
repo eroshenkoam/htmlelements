@@ -7,12 +7,15 @@ import org.openqa.selenium.WebDriver;
 import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 
 public class Context {
 
     public static final String DESCRIPTION_KEY = "description";
 
     public static final String LISTENERS_KEY = "listeners";
+
+    public static final String PROPERTIES_KEY = "properties";
 
     public static final String DRIVER_KEY = "driver";
 
@@ -53,6 +56,9 @@ public class Context {
         childContext.getRegistry().registerExtensions(method);
         childContext.setParent(this);
         //extension
+        getStore().get(PROPERTIES_KEY, Properties.class).ifPresent(properties -> {
+            childContext.getStore().put(PROPERTIES_KEY, properties);
+        });
         getStore().get(LISTENERS_KEY, List.class).ifPresent(listeners -> {
             childContext.getStore().put(LISTENERS_KEY, listeners);
         });

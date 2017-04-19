@@ -17,6 +17,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
@@ -83,7 +84,8 @@ public class WebBlockMethodHandler implements InvocationHandler {
     }
 
     private RetryStatement prepareRetryStatement(Method method, Object[] args) {
-        RetryStatement retry = new RetryStatement()
+        Properties properties = getContext().getStore().get(Context.PROPERTIES_KEY, Properties.class).get();
+        RetryStatement retry = new RetryStatement(properties)
                 .ignoring(Throwable.class);
         if (method.isAnnotationPresent(Retry.class)) {
             Retry retryAnnotation = method.getAnnotation(Retry.class);
