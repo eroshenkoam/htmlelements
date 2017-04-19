@@ -28,7 +28,7 @@ public class TestData {
 
     public static final String SEARCH_FORM_XPATH = "//div[@class='form']";
 
-    public static final String SEARCH_FORM_TEMPLATE = "//div[@class='{{ className }}']";
+    public static final String SEARCH_FORM_TEMPLATE = "//div[@class='{{className}}']";
 
     public static final String REQUEST_INPUT_XPATH = "//div[@class='input']";
 

@@ -74,7 +74,7 @@ public class ReflectionUtils {
         Map<String, String> parameters = getParameters(method, args);
         String selector = method.getAnnotation(FindBy.class).value();
         for (String key : parameters.keySet()) {
-            selector = selector.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+            selector = selector.replaceAll("\\{\\{" + key + "\\}\\}", parameters.get(key));
         }
         return selector;
     }
@@ -84,7 +84,7 @@ public class ReflectionUtils {
             Map<String, String> parameters = getParameters(method, args);
             String name = method.getAnnotation(Description.class).value();
             for (String key : parameters.keySet()) {
-                name = name.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
+                name = name.replaceAll("\\{\\{" + key + "\\}\\}", parameters.get(key));
             }
             return name;
         } else {
