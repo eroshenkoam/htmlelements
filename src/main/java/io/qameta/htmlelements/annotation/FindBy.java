@@ -21,6 +21,7 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.function.Supplier;
+import java.util.stream.IntStream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -66,16 +67,18 @@ public @interface FindBy {
                             List<WebElement> originalElements = ((SearchContext) proxy).findElements(By.xpath(selector));
                             Type methodReturnType = ((ParameterizedType) method
                                     .getGenericReturnType()).getActualTypeArguments()[0];
-                            return (List) originalElements.stream()
-                                    .map(element -> createProxy((Class<?>) methodReturnType,
-                                            childContext.newChildContext(method, (Class<?>) methodReturnType),
-                                            () -> element,
+                            return IntStream.range(0, originalElements.size())
+                                    .mapToObj(i -> createProxy((Class<?>) methodReturnType, ((Supplier<Context>) () -> {
+                                                Context childCont = context.newChildContext(method, (Class<?>) methodReturnType);
+                                                childCont.getStore().put("selector", selector + "[" + (i + 1) + "]");
+                                                return childCont;
+                                            }).get(),
+                                            () -> originalElements.get(i),
                                             WebElement.class, Locatable.class))
                                     .collect(toList());
                         },
                         List.class);
             }
-
             return null;
         }
 
