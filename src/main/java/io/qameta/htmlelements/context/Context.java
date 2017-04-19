@@ -57,7 +57,8 @@ public class Context {
         childContext.setParent(this);
         //extension
         getStore().get(PROPERTIES_KEY, Properties.class).ifPresent(properties -> {
-            childContext.getStore().put(PROPERTIES_KEY, properties);
+            Properties child = new Properties(properties);
+            childContext.getStore().put(PROPERTIES_KEY, child);
         });
         getStore().get(LISTENERS_KEY, List.class).ifPresent(listeners -> {
             childContext.getStore().put(LISTENERS_KEY, listeners);
