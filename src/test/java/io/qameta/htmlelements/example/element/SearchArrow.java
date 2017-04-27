@@ -13,7 +13,7 @@ import io.qameta.htmlelements.extension.DescriptionProvider;
  */
 public interface SearchArrow extends WithSuggest<SearchArrow>, ExtendedWebElement<SearchArrow> {
 
-    @Description("Форма {{className}}")
+    @Description("Форма {{ className }}")
     @FindBy(TestData.SEARCH_FORM_TEMPLATE)
     SearchForm form(@Param("className") String className);
 
