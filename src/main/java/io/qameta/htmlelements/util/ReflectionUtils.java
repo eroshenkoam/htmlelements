@@ -54,7 +54,7 @@ public class ReflectionUtils {
         ).collect(Collectors.toList());
     }
 
-    public static Map<String, String> getParameters(Method method, Object[] args) {
+    public static Map<String, String> getLocalParameters(Method method, Object[] args) {
         Map<String, String> parameters = new HashMap<>();
         if (args == null) {
             return parameters;
@@ -70,9 +70,10 @@ public class ReflectionUtils {
         return splitCamelCase(clazz.getSimpleName());
     }
 
-    public static String getSelector(Method method, Object[] args, Map<String, String> global) {
-        Map<String, String> parameters = getParameters(method, args);
-        parameters.putAll(global);
+    public static String getSelector(Method method, Object[] args, Map<String, String> globalParameters) {
+        Map<String, String> parameters = new HashMap<>();
+        parameters.putAll(globalParameters);
+        parameters.putAll(getLocalParameters(method, args));
 
         String selector = method.getAnnotation(FindBy.class).value();
         for (String key : parameters.keySet()) {
@@ -83,7 +84,7 @@ public class ReflectionUtils {
 
     public static String getDescription(Method method, Object[] args) {
         if (method.isAnnotationPresent(Description.class)) {
-            Map<String, String> parameters = getParameters(method, args);
+            Map<String, String> parameters = getLocalParameters(method, args);
             String name = method.getAnnotation(Description.class).value();
             for (String key : parameters.keySet()) {
                 name = name.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
