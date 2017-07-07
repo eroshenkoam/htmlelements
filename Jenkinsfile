@@ -14,7 +14,7 @@ pipeline {
         stage('Release') {
             when { expression { return params.RELEASE } }
             steps {
-                configFileProvider([configFile(fileId: 'sonatype-settings.xml', variable: 'SETTINGS')]) {
+                configFileProvider([configFile(fileId: 'qameta-sonatype-settings.xml', variable: 'SETTINGS')]) {
                     sshagent(['qameta-ci_ssh']) {
                         sh 'git checkout master && git pull origin master'
                         sh "./mvnw release:prepare release:perform -B -s ${env.SETTINGS} " +
