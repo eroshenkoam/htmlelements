@@ -10,6 +10,7 @@ import org.openqa.selenium.WebDriver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 
 import static io.qameta.htmlelements.context.Context.newWebPageContext;
@@ -20,6 +21,8 @@ public class WebPageFactory {
 
     private final Properties properties = new Properties();
 
+    private final Properties parameters = new Properties();
+
     public WebPageFactory listener(Listener listener) {
         this.listeners.add(listener);
         return this;
@@ -27,6 +30,16 @@ public class WebPageFactory {
 
     public WebPageFactory property(String key, String value) {
         properties.setProperty(key, value);
+        return this;
+    }
+
+    public WebPageFactory parameter(String key, String value) {
+        parameters.put(key, value);
+        return this;
+    }
+
+    public WebPageFactory parameters(Map<String, String> map) {
+        map.forEach(this::parameter);
         return this;
     }
 

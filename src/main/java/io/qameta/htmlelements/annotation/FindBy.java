@@ -19,7 +19,9 @@ import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Supplier;
 import java.util.stream.IntStream;
 
@@ -32,6 +34,7 @@ public @interface FindBy {
 
     String value();
 
+    @SuppressWarnings("unchecked")
     class Extension implements MethodHandler<Object> {
 
         @Override
@@ -40,7 +43,9 @@ public @interface FindBy {
 
             // html element proxy (recurse)
             if (method.isAnnotationPresent(FindBy.class) && WebElement.class.isAssignableFrom(proxyClass)) {
-                String selector = ReflectionUtils.getSelector(method, args);
+                Map<String, String> global = context.getStore().get(Context.PARAMETERS_KEY, Map.class)
+                        .orElse(new HashMap());
+                String selector = ReflectionUtils.getSelector(method, args, global);
 
                 Context childContext = context.newChildContext(method, method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)
@@ -55,7 +60,9 @@ public @interface FindBy {
 
             // html element list proxy (recurse)
             if (method.isAnnotationPresent(FindBy.class) && List.class.isAssignableFrom(method.getReturnType())) {
-                String selector = ReflectionUtils.getSelector(method, args);
+                Map<String, String> global = context.getStore().get(Context.PARAMETERS_KEY, Map.class)
+                        .orElse(new HashMap());
+                String selector = ReflectionUtils.getSelector(method, args, global);
 
                 Context childContext = context.newChildContext(method, method.getReturnType());
                 childContext.getRegistry().getExtensions(ContextEnricher.class)

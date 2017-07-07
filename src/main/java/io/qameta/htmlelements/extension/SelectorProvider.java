@@ -9,6 +9,8 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Target(ElementType.METHOD)
@@ -22,8 +24,11 @@ public @interface SelectorProvider {
         private static final String SELECTOR_KEY = "selector";
 
         @Override
+        @SuppressWarnings("unchecked")
         public void enrich(Context context, Method method, Object[] args) {
-            String selector = ReflectionUtils.getSelector(method, args);
+            Map<String, String> global = context.getStore().get(Context.PARAMETERS_KEY, Map.class)
+                    .orElse(new HashMap());
+            String selector = ReflectionUtils.getSelector(method, args, global);
             context.getStore().put(SELECTOR_KEY, selector);
         }
 
