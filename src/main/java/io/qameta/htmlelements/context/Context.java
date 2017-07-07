@@ -17,6 +17,8 @@ public class Context {
 
     public static final String PROPERTIES_KEY = "properties";
 
+    public static final String PARAMETERS_KEY = "parameters";
+
     public static final String DRIVER_KEY = "driver";
 
     private Context parent;

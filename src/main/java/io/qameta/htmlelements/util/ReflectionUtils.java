@@ -70,8 +70,10 @@ public class ReflectionUtils {
         return splitCamelCase(clazz.getSimpleName());
     }
 
-    public static String getSelector(Method method, Object[] args) {
+    public static String getSelector(Method method, Object[] args, Map<String, String> global) {
         Map<String, String> parameters = getParameters(method, args);
+        parameters.putAll(global);
+
         String selector = method.getAnnotation(FindBy.class).value();
         for (String key : parameters.keySet()) {
             selector = selector.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
