@@ -47,6 +47,7 @@ public class WebPageFactory {
         Context context = newWebPageContext(pageObjectClass, driver);
         context.getStore().put(Context.LISTENERS_KEY, listeners);
         context.getStore().put(Context.PROPERTIES_KEY, properties);
+        context.getStore().put(Context.PARAMETERS_KEY, parameters);
         if (pageObjectClass.isAnnotationPresent(BaseUrl.class)) {
             context.getStore().put(Store.BASE_URL_KEY, pageObjectClass.getAnnotation(BaseUrl.class).value());
         }
