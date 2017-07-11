@@ -62,6 +62,10 @@ public class Context {
             Properties child = new Properties(properties);
             childContext.getStore().put(PROPERTIES_KEY, child);
         });
+        getStore().get(PARAMETERS_KEY, Properties.class).ifPresent(properties -> {
+            Properties child = new Properties(properties);
+            childContext.getStore().put(PARAMETERS_KEY, child);
+        });
         getStore().get(LISTENERS_KEY, List.class).ifPresent(listeners -> {
             childContext.getStore().put(LISTENERS_KEY, listeners);
         });

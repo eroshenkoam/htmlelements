@@ -3,6 +3,7 @@ package io.qameta.htmlelements;
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.element.HtmlElement;
 import io.qameta.htmlelements.example.TestData;
+import io.qameta.htmlelements.matcher.DisplayedMatcher;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -21,14 +22,14 @@ public class GlobalParametersTest {
     @Test
     public void globalParametersTest() {
         WebDriver driver = TestData.mockDriver();
-        WebElement element = TestData.WebElementBuilder.mockWebElement().build();
+        WebElement element = TestData.WebElementBuilder.mockWebElement().withDisplayed(true).build();
         when(driver.findElement(By.xpath("//div[@class='value']"))).thenReturn(element);
 
         WebPageFactory factory = new WebPageFactory()
                 .parameter("key", "value");
 
         SimplePage page = factory.get(driver, SimplePage.class);
-        assertThat(page.input(), notNullValue());
+        page.input().should(DisplayedMatcher.displayed());
 
     }
 
