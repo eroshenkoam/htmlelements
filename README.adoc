@@ -10,9 +10,390 @@ with a couple of fresh ideas:
 for your project, allowing you to fine-tune the specifics.
 +
 
+== Overview
+HtmlElements 2 has several basic entities that you will be working with:
 
-include::docs/overview.adoc[leveloffset=+1]
+*WebPage* - instances of this class will serve as top classes of your page objects hierarchy.
 
-include::docs/structuring.adoc[leveloffset=+1]
+*WebPageFactory* - returns WebPage instances that are wrapped around the given driver.
+[source, java]
+----
+WebPageFactory factory = new WebPageFactory();
+SearchPage page = factory.get(driver, SearchPage.class);
+----
 
-include::docs/features.adoc[leveloffset=+1]
+*ExtendedWebElement* - is a parent interface for every web element you will be using in your tests.
+
+*ExtendedList* - an interface, which provides everything to work with a collection of ExtendedWebElements.
+
+== Structuring Page Objects
+
+[cols="2",frame="none"]
+|=========================================================
+
+a|
+1) Defining a page: pages are top-classes and they may contain elements or whole element blocks.
+[source, java]
+----
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage {
+
+  @FindBy("//form[contains(@class, 'search2 suggest2-form')]")
+  SearchArrow searchArrow();
+
+  @FindBy("//div[@class='toolbar']")
+  Toolbar toolbar();
+
+  @FindBy("//div[@class='user-tooltip']")
+  UserTooltip userTooltip();
+}
+----
+a|
+Web pages usually contain some high-level blocks, that we will neatly organize via a composition
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+<form class='search2 suggest2-form'>...</form>
+...
+</body>
+----
+a|
+2) Organizing a block of web elements on the page: you need to extend an interface from ExtendedWebElement
+and you are good to go
+[source, java]
+----
+public interface Toolbar extends ExtendedWebElement<Toolbar>{
+
+    @FindBy(".//span[@class = 'status-text']")
+    ExtendedWebElement statusText();
+}
+----
+a|
+Your classes for such blocks of elements can contain sub-blocks, or once you've reached a singular element,
+ use the ExtendedWebElement as it's type.
+[source, html]
+----
+<body>
+<div class='toolbar'>
+  <span class='status-text'> Status </span>
+  ...
+</div>
+<form class='search2 suggest2-form'>...</form>
+...
+</body>
+----
+a|
+3) You can define a collection of elements for a page or for a block
+[source, java]
+----
+public interface Toolbar extends ExtendedWebElement<Toolbar>{
+
+    @FindBy(".//button[@class = 'action-button']")
+    ExtendedList<ToolbarButton> buttons();
+
+    @FindBy(".//span[@class = 'status-text']")
+    ExtendedWebElement statusText();
+}
+----
+a|
+Button elements have a specific ToolbarButton class to represent them.
+[source, html]
+----
+<body>
+<div class='toolbar'>
+   <span class='status-text'> Status
+   </span>
+   <button class='action-button'>
+      <img src='//button-1-icon.png'>
+      ...
+   </button>
+   <button class='action-button'>
+      <img src='//button-2-icon.png'>
+      ...
+   </button>
+   ...
+</div>
+<form class='search2 suggest2-form'>...</form>
+...
+</body>
+----
+a|
+4) You can use parameterized selectors to simplify your work with homogeneous elements
+[source, java]
+----
+public interface SearchResultsPanel extends ExtendedWebElement<SearchResultsForm> {
+
+    @Description("Search result for user {{userName}}")
+    @FindBy(".//div[contains(@class, 'search-result-item') and contains(., {{userName}}]")
+    UserResult user(@Param("userName") String userName);
+}
+----
+
+Invocation of parameterized method:
+[source, java]
+----
+UserResult foundUser = searchPage.resultsPanel().user("User 1");
+----
+a|
+Here parameterized element will match a block of elements for User 1 from search results. Parameters can be used with
+collections of elements as well.
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+<form class='search2 suggest2-form'>...</form>
+<div class='search-results'>
+   <div class = 'search-result-item search-result-user'>
+      <span>User 1</span>
+      ...
+   </div>
+   <div class = 'search-result-item search-result-task'>
+         <span>Task 1</span>
+         ...
+   </div>
+</div>
+...
+</body>
+----
+a|
+5) Very often you will have some identical html blocks across different pages, e.g. toolbars, footers, dropdowns,
+ pickers e.t.c. Once you wrote a class describing such a block, it can be easily reused across all of the pages:
+[source, java]
+----
+
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage, WithToolbar<SearchPage> {
+
+     //other elements for search page here
+}
+
+@BaseUrl("http://www.base.url/account")
+public interface AccountPage extends WebPage, WithToolbar<AccountPage> {
+
+     //other elements for account page here
+}
+
+public interface WithToolbar<T> extends ExtendedWebElement<T>{
+
+   @FindBy("//div[@class='toolbar']")
+   Toolbar toolbar();
+}
+----
+a|
+First page - base.url/search:
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+...
+</body>
+----
+
+Second page - base.url/account:
+[source, html]
+----
+<body>
+<div class='toolbar'>...</div>
+...
+</body>
+----
+
+both pages have a toolbar block, represented by the Toolbar class.
+|=========================================================
+
+== Features
+After you have described web pages, it's time to start organizing the logic of working with them.
+We prefer to use a BDD approach, where you break down all the interaction logic into simple actions and create
+one "step" method per action as it's implementation. That is where all the extension methods from ExtendedWebElement
+and ExtendedList classes come in handy.
+
+We will use http://hamcrest.org/JavaHamcrest/javadoc/1.3/org/hamcrest/Matchers.html[harmcrest matchers] for conditioning
+
+
+=== Working with elements
+*Waiting on a condition for a single element.*
+`ExtendedWebElement` have two different extension methods for waiting.
+
+First - `waitUntil(Matcher matcher)` which waits with a configurable timeout and polling on some condition
+in a passed matcher, throwing `java.lang.RuntimeException` if condition has not been satisfied.
+[source, java]
+----
+@Step("Make search with input string «{}»")
+    public SearchPageSteps makeSearch(String input){
+        final SearchForm form = onSearchPage().searchPanel().form();
+        form.waitUntil(WebElement::isDisplayed) //waits for element to satisfy a condition
+                .sendKeys(input); //invokes standard WebElement's method
+        form.submit();
+        return this;
+    }
+----
+
+Second - `should(Matcher matcher)` which waits the same way on a passed matcher, but throwing
+`java.lang.AssertionError` instead.
+[source, java]
+----
+@Step("Check user «{}» is found")
+    public SearchPageSteps checkUserIsFound(String userName){
+        onSearchPage().resultsPanel().user(userName)
+        .should("User is not found", WebElement::isDisplayed);
+        //makes a waiting assertion here
+        return this;
+    }
+----
+
+*Performing actions on elements.* There're not many built-in extension methods for actions, since it would clutter the
+`WebElement` 's api too much. Instead it's better to introduce your own custom methods only when you actually need them.
+To show how this idea works we made a `ScrollableElement` and an additional `hover()` method for the `ExtendedWebElement`.
+
+[source, java]
+----
+@Step("Check current user info tooltip is shown")
+    public SearchPageSteps checkUserInfoTooltip(String userName){
+        onSearchPage().toolbar().currentUserIcon()
+                .hover(); //invokes new Actions().moveToElement(element)
+        onSearchPage().userTooltip()
+        .should("A tooltip should be displayed for user's avatar", Matchers::isDisplayed)
+        //making first assertion that tooltip is shown
+        .userName()  // going to the child element in the same chain of calls
+        .should("Unexpected user in tooltip", hasText(input))  //second assertion
+        return this;
+    }
+----
+
+`ScrollableElement` is just a very simple class introducing single `scrollToElement()` method.
+Annotation `@ScrollMethod` points to the method's implementation.
+[source, java]
+----
+public interface ScrollableElement extends ExtendedWebElement {
+
+    @ScrollMethod
+    void scrollToElement();
+}
+----
+
+Now to perform a scroll you just need to specify it as a type for an element.
+[source, java]
+----
+public interface Footer extends ScrollableElement<Footer> {
+
+  @FindBy(".//div[@class = 'support-chat-button']")
+  ExtendedWebElement supportChatButton();
+}
+----
+
+Then you will be able to scroll to the actual footer of the page like this:
+[source, java]
+----
+@Step("Start a chat with support")
+    public SearchPageSteps startSupportChat(){
+        onSearchPage().footer().scrollToElement();
+        onSearchPage().footer().supportChatButton()
+        .waitUntil(WebElement::isDisplayed) //waiting for scroll to finish before click
+        .click();
+        return this;
+    }
+----
+
+=== Working with collections
+
+Collections of elements are meant to be indiscrete objects. Working with individual elements of a collection
+should generally be considered an anti-pattern, because elements behind the collection will not be refreshed
+on the subsequent calls, and their usage may lead to the `StaleElementReferenceException`.
+
+*Waiting and verifying collection state.* `ExtendedList` has the same `waitUntil()` and `should()` methods as were
+described above. Overall logic of their usage should be roughly the same, but with a little difference introduced by
+abilities to filter via `filter()` and to perform a mapping transformation via `convert()` methods.
+[source, java]
+----
+@Step("Check that search results contain exactly «{}»")
+    public SearchPageSteps checkSearchResults(List<String> expectedItems){
+        onSearchPage().resultsForm().usersFound()
+        .waitUntil(not(empty()) //waiting for elements to load
+        .convert(user -> user.name().getText()) //convert ExtendedWebElement to String
+        .should(containsInAnyOrder(expectedItems.toArray())); //assertion for a collection
+    }
+----
+
+*Filtering*
+[source, java]
+----
+@Step("Check active users contain exactly «{}»")
+    public SearchPageSteps checkActiveUsersFound(List<String> expectedUsers){
+        onSearchPage().resultsForm().usersFound()
+        .waitUntil(not(empty()) //waiting for elements to load
+        .filter(user -> user.getAttribute("class").contains("selected"))
+        .convert(user -> user.name().getText()) //convert ExtendedWebElement to String
+        .should(containsInAnyOrder(expectedItems.toArray())); //assertion for a collection
+    }
+----
+
+Don't do this! Use a parameterized selector instead.
+[source, java]
+----
+@Step("Select filter checkbox «{}»")
+    public SearchPageSteps selectFilterCheckbox(String name){
+         onSearchPage().searchPanel().filtersTab().checkboxes()
+                        .waitUntil(not(empty()))
+                        .filter(chkbox -> chkbox.getText().contains(name))
+                        .get(0).click(); //don't do this
+    }
+----
+
+=== Working with pages
+`WebPage` interface has several methods to help working with pages
+
+*Define a base url for page.* If you annotate a `WebPage` with `@BaseUrl` you can specify an url to be opened
+when `WebPage` 's `go()` method is called.
+
+[source, java]
+----
+
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage {
+
+     //elements for search page here
+}
+----
+
+Then after instantiation you can call `go()` method like this:
+
+[source, java]
+----
+WebPageFactory factory = new WebPageFactory();
+SearchPage page = factory.get(driver, SearchPage.class);
+page.go()
+----
+
+*Waiting for page loading.* There is a special `isAt(Matcher<String> url)` that waits on the condition for page's
+current url and `document.readyState` flag.
+
+[source, java]
+----
+
+@BaseUrl("http://www.base.url/search")
+public interface SearchPage extends WebPage {
+
+     @Description("Account button")
+     @FindBy("//div[@class = 'account-button']")
+     ExtendedWebElement accountButton();
+}
+
+@BaseUrl("http://www.base.url/account")
+public interface AccountPage extends WebPage {
+
+     //elements for account page here
+}
+----
+
+To navigate between this two pages you have to wait for the account page to load after click on 'Account' button.
+
+[source, java]
+----
+@Step("Go to the current account settings")
+public void openAccountSettings() {
+    onSearchPage().accountButton().click();
+    onAccountPage().isAt(equalTo("http://www.base.url/account"));
+    //continue working with account page
+}
+----
