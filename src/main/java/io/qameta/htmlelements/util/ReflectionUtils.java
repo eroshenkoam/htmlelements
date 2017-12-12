@@ -76,20 +76,14 @@ public class ReflectionUtils {
         parameters.putAll(getLocalParameters(method, args));
 
         String selector = method.getAnnotation(FindBy.class).value();
-        for (String key : parameters.keySet()) {
-            selector = selector.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
-        }
-        return selector;
+        return HandlebarsUtils.resolveVars(selector, parameters);
     }
 
     public static String getDescription(Method method, Object[] args) {
         if (method.isAnnotationPresent(Description.class)) {
             Map<String, String> parameters = getLocalParameters(method, args);
             String name = method.getAnnotation(Description.class).value();
-            for (String key : parameters.keySet()) {
-                name = name.replaceAll("\\{\\{ " + key + " \\}\\}", parameters.get(key));
-            }
-            return name;
+            return HandlebarsUtils.resolveVars(name, parameters);
         } else {
             return splitCamelCase(method.getName());
         }
