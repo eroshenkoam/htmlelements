@@ -74,7 +74,6 @@ public class WebBlockMethodHandler implements InvocationHandler {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private ListenerStatement prepareListenerStatement(Method method, Object[] args) {
         String description = getContext().getStore().get(Context.DESCRIPTION_KEY, String.class).orElse("");
         ListenerStatement statement = new ListenerStatement(description, method, args);

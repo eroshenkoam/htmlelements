@@ -22,10 +22,10 @@ public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
     FluentType hover();
 
     @JsClickMethod
-    FluentType jsClick(); // Workaround for click in internet explorer 11
+    void jsClick(); // Workaround for click in internet explorer 11
 
     @ScrollMethod
-    void scrollToElement(); // Workaround while geckodriver cannot scroll with hover
+    FluentType scrollToElement(); // Workaround while geckodriver cannot scroll with hover
 
     @UnwrappedWebElement
     WebElement getUnwrappedWebElement();
