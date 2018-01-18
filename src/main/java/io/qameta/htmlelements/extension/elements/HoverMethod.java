@@ -1,7 +1,9 @@
-package io.qameta.htmlelements.extension;
+package io.qameta.htmlelements.extension.elements;
 
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.WebPageException;
+import io.qameta.htmlelements.extension.HandleWith;
+import io.qameta.htmlelements.extension.MethodHandler;
 import io.qameta.htmlelements.handler.WebBlockMethodHandler;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;

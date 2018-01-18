@@ -1,7 +1,7 @@
 package io.qameta.htmlelements;
 
 import io.qameta.htmlelements.extension.DriverProvider;
-import io.qameta.htmlelements.extension.ToStringMethod;
+import io.qameta.htmlelements.extension.elements.ToStringMethod;
 import io.qameta.htmlelements.extension.page.GoMethod;
 import io.qameta.htmlelements.extension.page.IsAtMethod;
 import org.hamcrest.Matcher;

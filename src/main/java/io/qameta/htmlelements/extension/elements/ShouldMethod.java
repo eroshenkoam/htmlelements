@@ -1,10 +1,10 @@
-package io.qameta.htmlelements.extension;
+package io.qameta.htmlelements.extension.elements;
 
 import io.qameta.htmlelements.context.Context;
-import io.qameta.htmlelements.exception.WaitUntilException;
+import io.qameta.htmlelements.extension.HandleWith;
+import io.qameta.htmlelements.extension.MethodHandler;
 import org.hamcrest.Matcher;
 import org.hamcrest.StringDescription;
-import org.openqa.selenium.WebDriverException;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,8 +14,8 @@ import java.lang.reflect.Method;
 
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(WaitUntilMethod.Extension.class)
-public @interface WaitUntilMethod {
+@HandleWith(ShouldMethod.Extension.class)
+public @interface ShouldMethod {
 
     class Extension implements MethodHandler<Object> {
 
@@ -28,10 +28,10 @@ public @interface WaitUntilMethod {
                 StringDescription description = new StringDescription();
                 description.appendText(message).appendText("\nExpected: ").appendDescriptionOf(matcher).appendText("\n     but: ");
                 matcher.describeMismatch(proxy, description);
-                throw new WaitUntilException(description.toString());
+                throw new AssertionError(description.toString());
             }
             return proxy;
         }
-
     }
+
 }
