@@ -40,7 +40,7 @@ public class WebBlockMethodHandler implements InvocationHandler {
         return targetClasses;
     }
 
-    @SuppressWarnings("unused") //
+    @SuppressWarnings("unused")
     private Supplier getTargetProvider() {
         return this.targetProvider;
     }

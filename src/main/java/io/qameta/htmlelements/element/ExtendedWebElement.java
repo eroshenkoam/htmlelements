@@ -1,6 +1,7 @@
 package io.qameta.htmlelements.element;
 
 import io.qameta.htmlelements.extension.elements.HoverMethod;
+import io.qameta.htmlelements.extension.elements.JsClickMethod;
 import io.qameta.htmlelements.extension.elements.ShouldMethod;
 import io.qameta.htmlelements.extension.Timeout;
 import io.qameta.htmlelements.extension.elements.ToStringMethod;
@@ -20,8 +21,11 @@ public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
     @HoverMethod
     FluentType hover();
 
+    @JsClickMethod
+    FluentType jsClick(); // Workaround for click in internet explorer 11
+
     @ScrollMethod
-    void scrollToElement();
+    void scrollToElement(); // Workaround while geckodriver cannot scroll with hover
 
     @UnwrappedWebElement
     WebElement getUnwrappedWebElement();
