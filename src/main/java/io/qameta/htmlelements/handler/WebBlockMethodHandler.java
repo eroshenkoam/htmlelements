@@ -15,10 +15,8 @@ import io.qameta.htmlelements.statement.Statement;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.UndeclaredThrowableException;
 import java.util.List;
 import java.util.Properties;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Supplier;
 
@@ -42,6 +40,7 @@ public class WebBlockMethodHandler implements InvocationHandler {
         return targetClasses;
     }
 
+    @SuppressWarnings("unused")
     private Supplier getTargetProvider() {
         return this.targetProvider;
     }
@@ -75,16 +74,16 @@ public class WebBlockMethodHandler implements InvocationHandler {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private ListenerStatement prepareListenerStatement(Method method, Object[] args) {
-        String description = getContext().getStore().get(Context.DESCRIPTION_KEY, String.class).get();
+        String description = getContext().getStore().get(Context.DESCRIPTION_KEY, String.class).orElse("");
         ListenerStatement statement = new ListenerStatement(description, method, args);
         getContext().getStore().get(Context.LISTENERS_KEY, List.class).ifPresent(statement::withListeners);
         return statement;
     }
 
     private RetryStatement prepareRetryStatement(Method method, Object[] args) {
-        Properties properties = getContext().getStore().get(Context.PROPERTIES_KEY, Properties.class).get();
+        Properties properties = getContext().getStore().get(Context.PROPERTIES_KEY, Properties.class)
+                .orElse(new Properties());
         RetryStatement retry = new RetryStatement(properties)
                 .ignoring(Throwable.class);
         if (method.isAnnotationPresent(Retry.class)) {

@@ -2,12 +2,11 @@ package io.qameta.htmlelements;
 
 import io.qameta.htmlelements.example.element.SuggestItem;
 import io.qameta.htmlelements.statement.Listener;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.WebDriver;
 import io.qameta.htmlelements.example.TestData;
 import io.qameta.htmlelements.example.page.SearchPage;
-import org.junit.Test;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.interactions.Actions;
 
 import java.lang.reflect.Method;
 

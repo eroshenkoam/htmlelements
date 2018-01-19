@@ -1,6 +1,8 @@
-package io.qameta.htmlelements.extension;
+package io.qameta.htmlelements.extension.elements;
 
 import io.qameta.htmlelements.context.Context;
+import io.qameta.htmlelements.extension.HandleWith;
+import io.qameta.htmlelements.extension.MethodHandler;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -14,7 +16,7 @@ import java.util.NoSuchElementException;
 @HandleWith(ToStringMethod.Extension.class)
 public @interface ToStringMethod {
 
-    class Extension implements MethodHandler<String>{
+    class Extension implements MethodHandler<String> {
 
         @Override
         public String handle(Context context, Object proxy, Method method, Object[] args) throws Throwable {

@@ -18,13 +18,13 @@ import java.lang.reflect.Proxy;
 
 import static io.qameta.htmlelements.context.Store.DRIVER_KEY;
 
-/**
- * @author ehborisov
+/*
+ * Created by igor.martynov on 1/19/18.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@HandleWith(ScrollMethod.Extension.class)
-public @interface ScrollMethod {
+@HandleWith(JsSendTextMethod.Extension.class)
+public @interface JsSendTextMethod {
 
     class Extension implements MethodHandler {
 
@@ -33,8 +33,10 @@ public @interface ScrollMethod {
             JavascriptExecutor driver = (JavascriptExecutor) context.getStore().get(DRIVER_KEY, WebDriver.class)
                     .orElseThrow(() -> new WebPageException("WebDriver is missing"));
 
+            String message = (String) args[0];
             WebBlockMethodHandler handler = (WebBlockMethodHandler) Proxy.getInvocationHandler(proxy);
-            driver.executeScript("arguments[0].scrollIntoView();", (WebElement) handler.getUnwrappedObject());
+            driver.executeScript("arguments[0].setAttribute('value', '" + message + "');",
+                    (WebElement) handler.getUnwrappedObject());
             return proxy;
         }
     }

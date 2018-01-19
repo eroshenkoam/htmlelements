@@ -1,21 +1,34 @@
 package io.qameta.htmlelements.element;
 
-import io.qameta.htmlelements.extension.HoverMethod;
-import io.qameta.htmlelements.extension.ShouldMethod;
+import io.qameta.htmlelements.extension.elements.*;
 import io.qameta.htmlelements.extension.Timeout;
-import io.qameta.htmlelements.extension.ToStringMethod;
-import io.qameta.htmlelements.extension.WaitUntilMethod;
 import io.qameta.htmlelements.matcher.PredicateMatcher;
 import org.hamcrest.Matcher;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.interactions.internal.Locatable;
 
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public interface ExtendedWebElement<FluentType> extends WebElement, Locatable {
 
     @HoverMethod
     FluentType hover();
+
+    @JsClickMethod
+    void jsClick(); // Workaround for click in internet explorer 11
+
+    @JsSendTextMethod
+    void jsSendText(String message);
+
+    @JsClearMethod
+    void jsClear();
+
+    @ScrollMethod
+    FluentType scrollToElement(); // Workaround while geckodriver cannot scroll with hover
+
+    @UnwrappedWebElementMethod
+    WebElement getUnwrappedWebElement();
 
     @WaitUntilMethod
     FluentType waitUntil(String message, Matcher matcher);

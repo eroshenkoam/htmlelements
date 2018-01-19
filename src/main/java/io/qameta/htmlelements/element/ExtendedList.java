@@ -4,10 +4,10 @@ import io.qameta.htmlelements.extension.ConvertMethod;
 import io.qameta.htmlelements.extension.DescriptionProvider;
 import io.qameta.htmlelements.extension.FilterMethod;
 import io.qameta.htmlelements.extension.SelectorProvider;
-import io.qameta.htmlelements.extension.ShouldMethod;
+import io.qameta.htmlelements.extension.elements.ShouldMethod;
 import io.qameta.htmlelements.extension.Timeout;
-import io.qameta.htmlelements.extension.ToStringMethod;
-import io.qameta.htmlelements.extension.WaitUntilMethod;
+import io.qameta.htmlelements.extension.elements.ToStringMethod;
+import io.qameta.htmlelements.extension.elements.WaitUntilMethod;
 import io.qameta.htmlelements.matcher.PredicateMatcher;
 import org.hamcrest.Matcher;
 
@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
+@SuppressWarnings("unused")
 public interface ExtendedList<ItemType> extends List<ItemType> {
 
     @SelectorProvider

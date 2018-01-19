@@ -1,8 +1,8 @@
 package io.qameta.htmlelements;
 
 import io.qameta.htmlelements.example.page.SearchPage;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.TimeoutException;
 import org.openqa.selenium.WebDriver;
@@ -20,7 +20,7 @@ public class WebPageTest {
 
     private WebDriver driver;
 
-    @Before
+    @BeforeEach
     public void initFactory() {
         this.driver = mock(WebDriver.class);
         this.factory = new WebPageFactory();
@@ -42,7 +42,7 @@ public class WebPageTest {
         verify(driver).findElement(searchCriteria);
     }
 
-    @Test()
+    @Test
     public void webPageShouldGoToBaseUrl() {
         String pageUrl = "http://www.base.url";
 

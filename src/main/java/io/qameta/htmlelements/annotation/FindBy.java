@@ -10,7 +10,7 @@ import io.qameta.htmlelements.util.ReflectionUtils;
 import org.openqa.selenium.By;
 import org.openqa.selenium.SearchContext;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.internal.Locatable;
+import org.openqa.selenium.interactions.internal.Locatable;
 
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.ElementType;

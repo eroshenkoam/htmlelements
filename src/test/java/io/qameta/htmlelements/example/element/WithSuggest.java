@@ -4,8 +4,6 @@ import io.qameta.htmlelements.annotation.Description;
 import io.qameta.htmlelements.annotation.FindBy;
 import io.qameta.htmlelements.element.ExtendedList;
 import io.qameta.htmlelements.element.ExtendedWebElement;
-import io.qameta.htmlelements.element.HtmlElement;
-import io.qameta.htmlelements.element.HtmlElementList;
 import io.qameta.htmlelements.example.TestData;
 
 import java.util.List;
