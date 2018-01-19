@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.extension;
 
-import io.qameta.htmlelements.annotation.Description;
 import io.qameta.htmlelements.util.ReflectionUtils;
 
 import java.lang.reflect.AnnotatedElement;
@@ -24,13 +23,12 @@ public class ExtensionRegistry {
                         .forEach(registry::registerExtension));
 
         Map<String, MethodHandler> handlers = new HashMap<>();
-        ReflectionUtils.getMethods(extensionClass).forEach(method -> {
-            getHandleWithAnnotation(method).ifPresent(annotation -> {
-                Class<? extends MethodHandler> handlerClass = annotation.value();
-                MethodHandler handler = ReflectionUtils.newInstance(handlerClass);
-                handlers.put(method.getName(), handler);
-            });
-        });
+        ReflectionUtils.getMethods(extensionClass).forEach(method ->
+                getHandleWithAnnotation(method).ifPresent(annotation -> {
+                    Class<? extends MethodHandler> handlerClass = annotation.value();
+                    MethodHandler handler = ReflectionUtils.newInstance(handlerClass);
+                    handlers.put(method.getName(), handler);
+        }));
 
         registry.getHandlers().putAll(handlers);
         return registry;
@@ -45,7 +43,7 @@ public class ExtensionRegistry {
         this.handlers = new HashMap<>();
     }
 
-    public void registerExtension(Class<? extends Extension> extensionType) {
+    private void registerExtension(Class<? extends Extension> extensionType) {
         getExtensions().putIfAbsent(extensionType, ReflectionUtils.newInstance(extensionType));
     }
 
