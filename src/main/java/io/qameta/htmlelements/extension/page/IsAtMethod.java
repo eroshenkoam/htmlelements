@@ -1,6 +1,6 @@
 package io.qameta.htmlelements.extension.page;
 
-import com.google.common.base.Predicate;
+import com.google.common.base.Function;
 import io.qameta.htmlelements.context.Context;
 import io.qameta.htmlelements.exception.WebPageException;
 import io.qameta.htmlelements.extension.HandleWith;
@@ -39,8 +39,9 @@ public @interface IsAtMethod {
             new WebDriverWait(driver, 5)
                     .ignoring(Throwable.class)
                     .withMessage(format("Couldn't wait for page with url %s to load", expectedUrlMacher))
-                    .until((Predicate<WebDriver>) (d) -> (d != null && expectedUrlMacher.matches(d.getCurrentUrl())) &&
-                            WebDriverUtils.pageIsLoaded(d));
+                    .until((Function<? super WebDriver, Boolean>) d ->
+                            (d != null && expectedUrlMacher.matches(d.getCurrentUrl())) &&
+                                    WebDriverUtils.pageIsLoaded(d));
             return proxy;
         }
     }

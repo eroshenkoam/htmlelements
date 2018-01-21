@@ -1,6 +1,5 @@
 package io.qameta.htmlelements.statement;
 
-import com.google.common.base.Throwables;
 import org.openqa.selenium.support.ui.Clock;
 import org.openqa.selenium.support.ui.Duration;
 import org.openqa.selenium.support.ui.SystemClock;
@@ -10,6 +9,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
+
+import static com.google.common.base.Throwables.throwIfUnchecked;
 
 /**
  * eroshenkoam
@@ -67,7 +68,8 @@ public class RetryStatement implements StatementWrapper {
                             break;
                         }
                     } else {
-                        Throwables.propagate(e);
+                        throwIfUnchecked(e);
+                        throw new RuntimeException(e);
                     }
                 }
             } while ((clock.isNowBefore(end)));
