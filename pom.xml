@@ -36,8 +36,7 @@
 
     <properties>
         <compiler.version>1.8</compiler.version>
-
-        <selenium.version>2.53.0</selenium.version>
+        <selenium.version>3.8.1</selenium.version>
     </properties>
 
     <dependencies>
