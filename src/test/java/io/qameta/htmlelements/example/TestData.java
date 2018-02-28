@@ -1,17 +1,13 @@
 package io.qameta.htmlelements.example;
 
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static io.qameta.htmlelements.example.TestData.WebElementBuilder.mockWebElement;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -45,11 +41,13 @@ public class TestData {
                         .withChildElement(SUGGEST_ITEM_XPATH, mockWebElement().withText("first suggest item").build())
                         .withText("first suggest")
                         .withDisplayed(false, true)
+                        .withEnabled(false, true)
                         .build(),
                 mockWebElement()
                         .withChildElement(SUGGEST_ITEM_XPATH, mockWebElement().withText("second suggest item").build())
                         .withText("second suggest")
                         .withDisplayed(false, false, false, true)
+                        .withEnabled(false, false, false, true)
                         .build()
         );
 
@@ -63,6 +61,7 @@ public class TestData {
                 .withChildElement(SEARCH_FORM_XPATH, searchForm)
                 .withText("search-arro", "search", "search-arrow")
                 .withDisplayed(true)
+                .withEnabled(true)
                 .build();
 
 
@@ -99,6 +98,11 @@ public class TestData {
 
         public WebElementBuilder withDisplayed(boolean displayed, Boolean... other) {
             when(getElement().isDisplayed()).thenReturn(displayed, other);
+            return this;
+        }
+
+        public WebElementBuilder withEnabled(boolean enabled, Boolean... other) {
+            when(getElement().isEnabled()).thenReturn(enabled, other);
             return this;
         }
 
